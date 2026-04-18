@@ -484,6 +484,193 @@ app.get('/api/dashboard', async (req, res) => {
 // ════════════════════════════════════════════════════════════════════════════
 
 const PORT = process.env.PORT || 3001;
+// ════════════════════════════════════════════════════════
+//  ONE-CLICK AWS ACTIONS
+// ════════════════════════════════════════════════════════
+
+const { CreateBucketCommand, DeleteBucketCommand, 
+        PutBucketEncryptionCommand, 
+        PutPublicAccessBlockCommand } = require('@aws-sdk/client-s3');
+
+const { TerminateInstancesCommand, 
+        RebootInstancesCommand } = require('@aws-sdk/client-ec2');
+
+const { CreateFunctionCommand, 
+        DeleteFunctionCommand,
+        InvokeCommand } = require('@aws-sdk/client-lambda');
+
+const { CreateDBSnapshotCommand } = require('@aws-sdk/client-rds');
+
+const { UpdateServiceCommand } = require('@aws-sdk/client-ecs');
+
+// ── CREATE S3 BUCKET ──────────────────────────────────
+app.post('/api/actions/s3/create', async (req, res) => {
+  try {
+    const { bucketName, region } = req.body;
+    if (!bucketName) return res.status(400).json({ error: 'Bucket name required' });
+
+    // Create bucket
+    await s3.send(new CreateBucketCommand({
+      Bucket: bucketName,
+      ...(region !== 'us-east-1' && {
+        CreateBucketConfiguration: { LocationConstraint: region || REGION }
+      })
+    }));
+
+    // Block public access
+    await s3.send(new PutPublicAccessBlockCommand({
+      Bucket: bucketName,
+      PublicAccessBlockConfiguration: {
+        BlockPublicAcls: true,
+        IgnorePublicAcls: true,
+        BlockPublicPolicy: true,
+        RestrictPublicBuckets: true
+      }
+    }));
+
+    // Enable encryption
+    await s3.send(new PutBucketEncryptionCommand({
+      Bucket: bucketName,
+      ServerSideEncryptionConfiguration: {
+        Rules: [{
+          ApplyServerSideEncryptionByDefault: {
+            SSEAlgorithm: 'AES256'
+          }
+        }]
+      }
+    }));
+
+    console.log(`[Action] ✅ Created S3 bucket: ${bucketName}`);
+    res.json({ 
+      success: true, 
+      message: `Bucket ${bucketName} created with encryption and public access blocked`,
+      bucketName 
+    });
+  } catch (err) {
+    console.error('[Action] S3 create error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── DELETE S3 BUCKET ──────────────────────────────────
+app.delete('/api/actions/s3/:bucketName', async (req, res) => {
+  try {
+    await s3.send(new DeleteBucketCommand({ Bucket: req.params.bucketName }));
+    console.log(`[Action] ✅ Deleted S3 bucket: ${req.params.bucketName}`);
+    res.json({ success: true, message: `Bucket ${req.params.bucketName} deleted` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── START EC2 INSTANCE ────────────────────────────────
+app.post('/api/actions/ec2/start/:id', async (req, res) => {
+  try {
+    const data = await ec2.send(new StartInstancesCommand({ 
+      InstanceIds: [req.params.id] 
+    }));
+    console.log(`[Action] ✅ Started EC2: ${req.params.id}`);
+    res.json({ 
+      success: true, 
+      state: data.StartingInstances[0].CurrentState.Name,
+      instanceId: req.params.id
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── STOP EC2 INSTANCE ─────────────────────────────────
+app.post('/api/actions/ec2/stop/:id', async (req, res) => {
+  try {
+    const data = await ec2.send(new StopInstancesCommand({ 
+      InstanceIds: [req.params.id] 
+    }));
+    console.log(`[Action] ✅ Stopped EC2: ${req.params.id}`);
+    res.json({ 
+      success: true, 
+      state: data.StoppingInstances[0].CurrentState.Name,
+      instanceId: req.params.id
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── REBOOT EC2 INSTANCE ───────────────────────────────
+app.post('/api/actions/ec2/reboot/:id', async (req, res) => {
+  try {
+    await ec2.send(new RebootInstancesCommand({ 
+      InstanceIds: [req.params.id] 
+    }));
+    console.log(`[Action] ✅ Rebooted EC2: ${req.params.id}`);
+    res.json({ success: true, message: `Instance ${req.params.id} rebooting` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── CREATE RDS SNAPSHOT ───────────────────────────────
+app.post('/api/actions/rds/snapshot', async (req, res) => {
+  try {
+    const { dbInstanceId } = req.body;
+    const snapshotId = `${dbInstanceId}-manual-${Date.now()}`;
+    
+    const data = await rds.send(new CreateDBSnapshotCommand({
+      DBInstanceIdentifier: dbInstanceId,
+      DBSnapshotIdentifier: snapshotId
+    }));
+
+    console.log(`[Action] ✅ Created RDS snapshot: ${snapshotId}`);
+    res.json({ 
+      success: true, 
+      snapshotId,
+      status: data.DBSnapshot.Status
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── SCALE ECS SERVICE ─────────────────────────────────
+app.post('/api/actions/ecs/scale', async (req, res) => {
+  try {
+    const { cluster, service, desiredCount } = req.body;
+    
+    await ecs.send(new UpdateServiceCommand({
+      cluster,
+      service,
+      desiredCount: parseInt(desiredCount)
+    }));
+
+    console.log(`[Action] ✅ Scaled ECS ${service} to ${desiredCount} tasks`);
+    res.json({ 
+      success: true, 
+      message: `Service ${service} scaled to ${desiredCount} tasks`
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── INVOKE LAMBDA ─────────────────────────────────────
+app.post('/api/actions/lambda/invoke/:name', async (req, res) => {
+  try {
+    const { payload } = req.body;
+    
+    const data = await lambda.send(new InvokeCommand({
+      FunctionName: req.params.name,
+      Payload: JSON.stringify(payload || {}),
+      InvocationType: 'RequestResponse'
+    }));
+
+    const response = JSON.parse(Buffer.from(data.Payload).toString());
+    console.log(`[Action] ✅ Invoked Lambda: ${req.params.name}`);
+    res.json({ success: true, response, statusCode: data.StatusCode });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 app.listen(PORT, () => {
   console.log('');
   console.log('  ███╗   ██╗██╗███╗   ███╗██████╗ ██╗   ██╗███████╗ █████╗ ██╗');
