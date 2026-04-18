@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>NimbusAI — Enterprise AWS Automation Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#07080d;--bg2:#0c0e17;--bg3:#10131f;--bg4:#141828;--bg5:#191e30;
+  --orange:#ff8c42;--orange2:#e6722a;--orange-d:rgba(255,140,66,.1);--orange-b:rgba(255,140,66,.22);
+  --teal:#00d4aa;--teal-d:rgba(0,212,170,.09);--teal-b:rgba(0,212,170,.2);
+  --blue:#4d9fff;--blue-d:rgba(77,159,255,.09);--blue-b:rgba(77,159,255,.2);
+  --purple:#a78bfa;--purple-d:rgba(167,139,250,.09);
+  --green:#22d67a;--green-d:rgba(34,214,122,.09);--green-b:rgba(34,214,122,.18);
+  --red:#ff4f4f;--red-d:rgba(255,79,79,.09);--red-b:rgba(255,79,79,.2);
+  --amber:#fbbf24;--amber-d:rgba(251,191,36,.09);
+  --text:#dde3f0;--text2:#7a8499;--text3:#3d4560;--text4:#222840;
+  --border:#1a1f35;--border2:#222840;--border3:#2a3050;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;display:flex;flex-direction:column;}
+
+/* TOPBAR */
+.topbar{height:48px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1rem;gap:.8rem;flex-shrink:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:.5rem;font-weight:800;font-size:1.05rem;letter-spacing:-.02em;color:var(--text);white-space:nowrap;}
+.logo-mark{width:26px;height:26px;background:linear-gradient(135deg,var(--orange),var(--orange2));border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900;color:#000;}
+.logo sub{font-size:.55rem;font-weight:500;color:var(--text3);font-family:'DM Mono',monospace;margin-left:2px;vertical-align:middle;}
+.tb-sep{width:1px;height:18px;background:var(--border2);flex-shrink:0;}
+.tb-sel{background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:3px 9px;font-size:.7rem;font-family:'DM Mono',monospace;border-radius:5px;cursor:pointer;outline:none;height:28px;}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:.6rem;}
+.tb-badge{padding:3px 8px;border-radius:4px;font-size:.63rem;font-family:'DM Mono',monospace;font-weight:500;display:flex;align-items:center;gap:4px;cursor:pointer;}
+.tb-green{background:var(--green-d);color:var(--green);border:1px solid var(--green-b);}
+.tb-orange{background:var(--orange-d);color:var(--orange);border:1px solid var(--orange-b);}
+.tb-red{background:var(--red-d);color:var(--red);border:1px solid var(--red-b);}
+.tb-blue{background:var(--blue-d);color:var(--blue);border:1px solid var(--blue-b);}
+.blink{width:5px;height:5px;border-radius:50%;animation:blink 1.8s infinite;}
+.blink-green{background:var(--green);}
+.blink-orange{background:var(--orange);}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.25;}}
+.tb-avatar{width:28px;height:28px;border-radius:7px;background:var(--orange-d);border:1px solid var(--orange-b);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:var(--orange);cursor:pointer;}
+
+/* LAYOUT */
+.app{display:flex;flex:1;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:210px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;}
+.sidebar::-webkit-scrollbar{width:0;}
+.sb-section{padding:.9rem .8rem .2rem;font-size:.58rem;font-weight:700;color:var(--text3);letter-spacing:.14em;text-transform:uppercase;font-family:'DM Mono',monospace;}
+.ni{display:flex;align-items:center;gap:.55rem;padding:.48rem .9rem;cursor:pointer;font-size:.77rem;font-weight:500;color:var(--text2);transition:all .1s;margin:1px 5px;border-radius:7px;}
+.ni:hover{background:var(--bg3);color:var(--text);}
+.ni.active{background:var(--orange-d);color:var(--orange);}
+.ni .ico{width:15px;text-align:center;font-size:.82rem;flex-shrink:0;}
+.ni .nb{margin-left:auto;font-size:.58rem;padding:1px 5px;border-radius:3px;font-family:'DM Mono',monospace;font-weight:500;}
+.nb-o{background:var(--orange-d);color:var(--orange);}
+.nb-r{background:var(--red-d);color:var(--red);}
+.nb-g{background:var(--green-d);color:var(--green);}
+.nb-b{background:var(--blue-d);color:var(--blue);}
+.sb-footer{margin-top:auto;padding:.7rem .8rem;border-top:1px solid var(--border);}
+.sb-user{display:flex;align-items:center;gap:.6rem;padding:.5rem .6rem;border-radius:7px;cursor:pointer;}
+.sb-user:hover{background:var(--bg3);}
+.sb-avatar{width:26px;height:26px;border-radius:6px;background:var(--teal-d);border:1px solid var(--teal-b);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:var(--teal);}
+.sb-info .sb-name{font-size:.75rem;font-weight:600;color:var(--text);}
+.sb-info .sb-role{font-size:.62rem;color:var(--text3);}
+
+/* CONTENT */
+.content{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.panel{display:none;flex:1;flex-direction:column;overflow:hidden;animation:fadein .18s ease;}
+.panel.active{display:flex;}
+@keyframes fadein{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:translateY(0);}}
+.scroll{overflow-y:auto;flex:1;padding:1.2rem 1.4rem;}
+.scroll::-webkit-scrollbar{width:3px;}
+.scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* PAGE HEAD */
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.2rem;flex-wrap:wrap;gap:.6rem;}
+.ph-left .ph-title{font-size:1.15rem;font-weight:800;color:var(--text);margin-bottom:2px;letter-spacing:-.02em;}
+.ph-left .ph-sub{font-size:.73rem;color:var(--text2);}
+.ph-actions{display:flex;gap:.5rem;align-items:center;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:.35rem;padding:.42rem .9rem;border-radius:7px;font-size:.74rem;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;transition:all .12s;border:none;white-space:nowrap;}
+.btn-primary{background:var(--orange);color:#000;}
+.btn-primary:hover{background:var(--orange2);}
+.btn-teal{background:var(--teal);color:#000;}
+.btn-teal:hover{background:#00b896;}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2);}
+.btn-ghost:hover{background:var(--bg3);color:var(--text);border-color:var(--border3);}
+.btn-danger{background:var(--red-d);color:var(--red);border:1px solid var(--red-b);}
+.btn-sm{padding:.3rem .7rem;font-size:.68rem;}
+.btn-xs{padding:.2rem .5rem;font-size:.63rem;}
+
+/* STAT CARDS */
+.stats-grid{display:grid;gap:.7rem;margin-bottom:1rem;}
+.stats-4{grid-template-columns:repeat(4,1fr);}
+.stats-3{grid-template-columns:repeat(3,1fr);}
+.stats-2{grid-template-columns:repeat(2,1fr);}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.9rem 1rem;position:relative;overflow:hidden;}
+.stat::after{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;border-radius:2px 2px 0 0;}
+.stat-o::after{background:var(--orange);}
+.stat-t::after{background:var(--teal);}
+.stat-b::after{background:var(--blue);}
+.stat-g::after{background:var(--green);}
+.stat-r::after{background:var(--red);}
+.stat-p::after{background:var(--purple);}
+.stat-val{font-size:1.55rem;font-weight:800;line-height:1;margin-bottom:3px;letter-spacing:-.03em;}
+.s-o{color:var(--orange);}
+.s-t{color:var(--teal);}
+.s-b{color:var(--blue);}
+.s-g{color:var(--green);}
+.s-r{color:var(--red);}
+.s-p{color:var(--purple);}
+.stat-label{font-size:.67rem;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;}
+.stat-sub{font-size:.65rem;font-family:'DM Mono',monospace;}
+.stat-up{color:var(--green);}
+.stat-dn{color:var(--red);}
+.stat-neu{color:var(--text3);}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:.8rem;}
+.card-head{padding:.7rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-size:.8rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:.45rem;}
+.card-body{padding:.8rem 1rem;}
+.card-body-np{padding:0;}
+
+/* GRID LAYOUTS */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;}
+.grid-6{display:grid;grid-template-columns:repeat(6,1fr);gap:.6rem;}
+.grid-lr{display:grid;grid-template-columns:1.4fr 1fr;gap:.8rem;}
+
+/* TABLES */
+.tbl{width:100%;border-collapse:collapse;font-size:.74rem;}
+.tbl th{text-align:left;padding:.45rem .7rem;color:var(--text3);font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;}
+.tbl td{padding:.55rem .7rem;border-bottom:1px solid rgba(26,31,53,.7);vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:rgba(255,255,255,.015);}
+.mono{font-family:'DM Mono',monospace;font-size:.7rem;}
+.sdot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle;}
+.sd-g{background:var(--green);box-shadow:0 0 5px var(--green);}
+.sd-o{background:var(--orange);}
+.sd-r{background:var(--red);}
+.sd-b{background:var(--blue);}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:.63rem;font-family:'DM Mono',monospace;font-weight:500;}
+.bg-o{background:var(--orange-d);color:var(--orange);border:1px solid var(--orange-b);}
+.bg-g{background:var(--green-d);color:var(--green);border:1px solid var(--green-b);}
+.bg-r{background:var(--red-d);color:var(--red);border:1px solid var(--red-b);}
+.bg-b{background:var(--blue-d);color:var(--blue);border:1px solid var(--blue-b);}
+.bg-t{background:var(--teal-d);color:var(--teal);border:1px solid var(--teal-b);}
+.bg-p{background:var(--purple-d);color:var(--purple);}
+.bg-gray{background:var(--bg4);color:var(--text2);border:1px solid var(--border2);}
+
+/* WORKFLOW GRID */
+.wf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;}
+.wfc{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:1rem;cursor:pointer;transition:all .14s;position:relative;overflow:hidden;}
+.wfc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .14s;}
+.wfc:hover{border-color:var(--border3);background:var(--bg4);}
+.wfc:hover::before{opacity:1;}
+.wfc-orange::before{background:var(--orange);}
+.wfc-teal::before{background:var(--teal);}
+.wfc-blue::before{background:var(--blue);}
+.wfc-green::before{background:var(--green);}
+.wfc-purple::before{background:var(--purple);}
+.wfc-red::before{background:var(--red);}
+.wfc-ico{font-size:1.4rem;margin-bottom:.55rem;}
+.wfc-name{font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:.3rem;}
+.wfc-desc{font-size:.69rem;color:var(--text2);line-height:1.5;margin-bottom:.6rem;}
+.wfc-tags{display:flex;gap:.3rem;flex-wrap:wrap;}
+.wfc-tag{font-size:.58rem;padding:1px 5px;border-radius:3px;font-family:'DM Mono',monospace;}
+.wt-o{background:var(--orange-d);color:var(--orange);}
+.wt-t{background:var(--teal-d);color:var(--teal);}
+.wt-b{background:var(--blue-d);color:var(--blue);}
+.wt-g{background:var(--green-d);color:var(--green);}
+.wt-p{background:var(--purple-d);color:var(--purple);}
+
+/* AI CHAT */
+.chat-wrap{display:flex;flex-direction:column;height:100%;overflow:hidden;}
+.chat-bar{padding:.65rem 1rem;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.chat-title{font-size:.82rem;font-weight:700;display:flex;align-items:center;gap:.5rem;}
+.chat-msgs{flex:1;overflow-y:auto;padding:1rem 1.2rem;display:flex;flex-direction:column;gap:.75rem;}
+.chat-msgs::-webkit-scrollbar{width:3px;}
+.chat-msgs::-webkit-scrollbar-thumb{background:var(--border2);}
+.cm{display:flex;gap:.65rem;animation:fadein .18s ease;}
+.cm-av{width:27px;height:27px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;flex-shrink:0;margin-top:1px;}
+.cm-ai .cm-av{background:var(--teal-d);border:1px solid var(--teal-b);color:var(--teal);}
+.cm-user .cm-av{background:var(--orange-d);border:1px solid var(--orange-b);color:var(--orange);}
+.cm-body{flex:1;min-width:0;}
+.cm-who{font-size:.62rem;color:var(--text3);margin-bottom:.28rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;font-family:'DM Mono',monospace;}
+.cm-text{font-size:.79rem;line-height:1.68;color:var(--text);background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.65rem .85rem;}
+.cm-user .cm-text{background:var(--bg3);border-color:var(--border2);}
+.cm-text code{background:rgba(0,0,0,.5);padding:1px 5px;border-radius:3px;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--orange);}
+.cm-text strong{color:var(--text);font-weight:700;}
+.cm-text ul,.cm-text ol{margin:.35rem 0 .35rem 1.1rem;}
+.cm-text li{margin-bottom:.15rem;}
+.cm-text pre{background:rgba(0,0,0,.6);border:1px solid var(--border2);border-radius:6px;padding:.65rem .8rem;margin:.4rem 0;overflow-x:auto;}
+.cm-text pre code{background:transparent;padding:0;color:#a8d8b0;font-size:.69rem;line-height:1.6;}
+.typing-dots{display:flex;gap:3px;padding:.4rem .5rem;}
+.typing-dots span{width:5px;height:5px;border-radius:50%;background:var(--text3);animation:tdot .9s infinite;}
+.typing-dots span:nth-child(2){animation-delay:.18s;}
+.typing-dots span:nth-child(3){animation-delay:.36s;}
+@keyframes tdot{0%,80%,100%{transform:scale(.6);opacity:.4;}40%{transform:scale(1);opacity:1;}}
+.chat-foot{border-top:1px solid var(--border);padding:.7rem .8rem;background:var(--bg2);flex-shrink:0;}
+.chat-inp-row{display:flex;gap:.45rem;margin-bottom:.55rem;}
+.chat-inp{flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:.5rem .85rem;font-family:'Outfit',sans-serif;font-size:.79rem;border-radius:8px;outline:none;}
+.chat-inp:focus{border-color:var(--orange-b);box-shadow:0 0 0 2px rgba(255,140,66,.06);}
+.chat-send{background:var(--orange);border:none;color:#000;width:34px;height:34px;border-radius:7px;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.chat-send:hover{background:var(--orange2);}
+.qp-row{display:flex;gap:.35rem;flex-wrap:wrap;}
+.qp{padding:.28rem .65rem;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;font-size:.67rem;color:var(--text2);cursor:pointer;transition:all .12s;font-family:'Outfit',sans-serif;font-weight:500;}
+.qp:hover{border-color:var(--orange-b);color:var(--orange);background:var(--orange-d);}
+
+/* IaC STUDIO */
+.iac-layout{display:grid;grid-template-columns:190px 1fr 1fr;height:100%;gap:0;overflow:hidden;}
+.iac-col{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.iac-head{padding:.6rem .85rem;background:var(--bg2);border-bottom:1px solid var(--border);font-size:.72rem;font-weight:700;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
+.iac-scroll{flex:1;overflow-y:auto;padding:.6rem;}
+.iac-scroll::-webkit-scrollbar{width:2px;}
+.iac-scroll::-webkit-scrollbar-thumb{background:var(--border2);}
+.svc-btn{display:flex;align-items:center;gap:.55rem;padding:.5rem .7rem;border-radius:7px;border:1px solid transparent;cursor:pointer;margin-bottom:3px;transition:all .1s;}
+.svc-btn:hover{background:var(--bg3);border-color:var(--border);}
+.svc-btn.active{background:var(--orange-d);border-color:var(--orange-b);}
+.svc-btn .si{font-size:.95rem;}
+.svc-btn .sn{font-size:.74rem;font-weight:600;color:var(--text);}
+.svc-btn .sd{font-size:.61rem;color:var(--text3);}
+.act-list{display:flex;flex-direction:column;gap:3px;}
+.act-btn{padding:.48rem .7rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .1s;font-size:.71rem;font-weight:500;color:var(--text2);}
+.act-btn:hover{border-color:var(--orange-b);color:var(--orange);background:var(--orange-d);}
+.code-view{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.code-head{padding:.5rem .85rem;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-family:'DM Mono',monospace;font-size:.68rem;color:var(--text3);flex-shrink:0;}
+.code-body{flex:1;overflow-y:auto;padding:.8rem;font-family:'DM Mono',monospace;font-size:.69rem;line-height:1.75;color:#8ecf9e;background:var(--bg);white-space:pre-wrap;word-break:break-all;}
+.code-body::-webkit-scrollbar{width:2px;}
+.code-body::-webkit-scrollbar-thumb{background:var(--border2);}
+.kw{color:#f472b6;}
+.str{color:#fde68a;}
+.cm{color:#4a5880;}
+.fn{color:var(--orange);}
+.num{color:#c4b5fd;}
+.attr{color:var(--teal);}
+
+/* PIPELINE BUILDER */
+.pipe-wrap{display:flex;flex-direction:column;height:100%;overflow:hidden;}
+.pipe-toolbar{padding:.6rem 1rem;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem;flex-shrink:0;}
+.pipe-canvas{flex:1;overflow:auto;padding:1.5rem;display:flex;flex-direction:column;gap:.5rem;}
+.pipe-stage{background:var(--bg2);border:1px solid var(--border);border-radius:9px;overflow:hidden;}
+.ps-head{padding:.6rem 1rem;background:var(--bg3);display:flex;align-items:center;justify-content:space-between;}
+.ps-name{font-size:.78rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:.4rem;}
+.ps-actions{display:flex;gap:.4rem;overflow-x:auto;padding:.7rem 1rem;min-height:72px;}
+.ps-action{background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:.55rem .75rem;min-width:130px;flex-shrink:0;cursor:pointer;transition:all .12s;}
+.ps-action:hover{border-color:var(--orange-b);background:var(--orange-d);}
+.psa-icon{font-size:.9rem;margin-bottom:.25rem;}
+.psa-name{font-size:.72rem;font-weight:600;color:var(--text);}
+.psa-type{font-size:.62rem;color:var(--text3);font-family:'DM Mono',monospace;}
+.pipe-arrow{text-align:center;color:var(--text3);font-size:.9rem;line-height:1;}
+.add-stage-btn{border:1px dashed var(--border2);border-radius:9px;padding:.7rem;text-align:center;cursor:pointer;font-size:.74rem;color:var(--text3);transition:all .12s;}
+.add-stage-btn:hover{border-color:var(--orange-b);color:var(--orange);background:var(--orange-d);}
+
+/* COST BARS */
+.cbar{margin-bottom:.65rem;}
+.cbar-top{display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:.28rem;}
+.cbar-label{color:var(--text2);font-weight:500;}
+.cbar-val{font-family:'DM Mono',monospace;color:var(--text);}
+.cbar-track{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;}
+.cbar-fill{height:100%;border-radius:2px;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+
+/* NETWORK VPC */
+.vpc-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;}
+.vpc-card{background:var(--bg3);border:2px dashed var(--border2);border-radius:10px;padding:1rem;}
+.vpc-title{font-size:.75rem;font-weight:700;margin-bottom:.7rem;display:flex;align-items:center;gap:.4rem;}
+.subnet{background:var(--bg4);border:1px solid var(--border2);border-radius:7px;padding:.6rem .8rem;margin-bottom:.5rem;}
+.subnet-pub{border-left:2px solid var(--teal);}
+.subnet-priv{border-left:2px solid var(--orange);}
+.subnet-name{font-size:.72rem;font-weight:600;margin-bottom:.2rem;}
+.subnet-cidr{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--text3);}
+.subnet-items{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.3rem;}
+.sitem{font-size:.6rem;padding:1px 5px;border-radius:3px;background:var(--bg5);color:var(--text3);}
+
+/* COMPLIANCE */
+.compliance-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-bottom:1rem;}
+.comp-card{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:.9rem;}
+.comp-name{font-size:.8rem;font-weight:700;margin-bottom:.2rem;}
+.comp-score{font-size:1.6rem;font-weight:800;margin:.4rem 0 .2rem;letter-spacing:-.03em;}
+.comp-bar-track{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;margin-bottom:.5rem;}
+.comp-bar-fill{height:100%;border-radius:2px;}
+.comp-stats{display:flex;gap:.5rem;}
+.comp-stat{font-size:.65rem;font-family:'DM Mono',monospace;}
+
+/* ALERT FEED */
+.alert-feed{display:flex;flex-direction:column;gap:.4rem;}
+.alert-item{display:flex;align-items:flex-start;gap:.7rem;padding:.6rem .8rem;background:var(--bg3);border:1px solid var(--border);border-radius:7px;cursor:pointer;transition:all .12s;}
+.alert-item:hover{border-color:var(--border3);}
+.alert-item .ai-icon{font-size:.95rem;flex-shrink:0;margin-top:1px;}
+.alert-item .ai-title{font-size:.76rem;font-weight:600;color:var(--text);margin-bottom:.15rem;}
+.alert-item .ai-desc{font-size:.69rem;color:var(--text2);line-height:1.4;}
+.alert-item .ai-time{font-size:.62rem;font-family:'DM Mono',monospace;color:var(--text3);margin-left:auto;flex-shrink:0;margin-top:1px;}
+.alert-crit{border-left:2px solid var(--red);}
+.alert-warn{border-left:2px solid var(--orange);}
+.alert-info{border-left:2px solid var(--blue);}
+.alert-ok{border-left:2px solid var(--green);}
+
+/* RUNBOOK */
+.rb-step{display:flex;gap:.8rem;padding:.8rem;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:.5rem;}
+.rb-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;flex-shrink:0;background:var(--orange-d);color:var(--orange);border:1px solid var(--orange-b);}
+.rb-content .rb-title{font-size:.78rem;font-weight:700;color:var(--text);margin-bottom:.2rem;}
+.rb-content .rb-desc{font-size:.71rem;color:var(--text2);line-height:1.5;}
+.rb-content code{font-family:'DM Mono',monospace;font-size:.68rem;background:rgba(0,0,0,.4);padding:1px 5px;border-radius:3px;color:var(--orange);}
+
+/* TABS */
+.tabs{display:flex;gap:2px;padding:.5rem .8rem;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0;}
+.tab{padding:.35rem .9rem;border-radius:6px;font-size:.74rem;font-weight:600;color:var(--text2);cursor:pointer;transition:all .12s;}
+.tab:hover{color:var(--text);}
+.tab.active{background:var(--orange-d);color:var(--orange);}
+.tab-content{display:none;flex:1;overflow:hidden;}
+.tab-content.active{display:flex;flex-direction:column;}
+
+/* FINOPS */
+.fo-metric{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.8rem;text-align:center;}
+.fo-val{font-size:1.3rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.2rem;}
+.fo-label{font-size:.65rem;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
+.rec-card{background:var(--bg3);border:1px solid var(--border);border-left:2px solid transparent;border-radius:8px;padding:.75rem .9rem;margin-bottom:.5rem;cursor:pointer;transition:all .12s;display:flex;gap:.7rem;align-items:flex-start;}
+.rec-card:hover{border-color:var(--border3);background:var(--bg4);}
+.rec-card.rc-o{border-left-color:var(--orange);}
+.rec-card.rc-g{border-left-color:var(--green);}
+.rec-card.rc-b{border-left-color:var(--blue);}
+.rec-ico{font-size:1.1rem;flex-shrink:0;}
+.rec-body .rec-title{font-size:.77rem;font-weight:700;color:var(--text);margin-bottom:.18rem;}
+.rec-body .rec-desc{font-size:.69rem;color:var(--text2);line-height:1.45;}
+.rec-body .rec-save{font-size:.68rem;font-family:'DM Mono',monospace;margin-top:.3rem;}
+.rs-g{color:var(--green);}
+.rs-o{color:var(--orange);}
+.rec-action{margin-left:auto;flex-shrink:0;}
+
+/* INSIGHT CARDS */
+.insight-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-bottom:1rem;}
+.insight-c{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:.8rem;}
+.insight-c .ic-title{font-size:.68rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;display:flex;align-items:center;gap:.35rem;}
+.insight-c .ic-val{font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:.2rem;}
+.insight-c .ic-sub{font-size:.67rem;color:var(--text3);}
+
+/* SEARCH */
+.search-bar{display:flex;align-items:center;gap:.5rem;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:.45rem .8rem;margin-bottom:1rem;}
+.search-bar input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:.78rem;font-family:'Outfit',sans-serif;}
+.search-bar input::placeholder{color:var(--text3);}
+.search-bar .si{color:var(--text3);font-size:.9rem;}
+
+/* KUBERNETES */
+.k8s-cluster{background:var(--bg3);border:2px dashed var(--border2);border-radius:10px;padding:1rem;margin-bottom:.8rem;}
+.k8s-title{font-size:.78rem;font-weight:700;margin-bottom:.7rem;display:flex;align-items:center;justify-content:space-between;}
+.k8s-nodes{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;}
+.k8s-node{background:var(--bg4);border:1px solid var(--border2);border-radius:7px;padding:.6rem;text-align:center;}
+.kn-name{font-size:.65rem;font-family:'DM Mono',monospace;margin-bottom:.2rem;color:var(--text2);}
+.kn-status{font-size:.62rem;margin-bottom:.3rem;}
+.kn-bar{height:3px;background:var(--bg5);border-radius:2px;overflow:hidden;}
+.kn-fill{height:100%;border-radius:2px;}
+
+/* LOGS */
+.log-line{font-family:'DM Mono',monospace;font-size:.68rem;line-height:1.8;padding:2px .5rem;border-radius:3px;}
+.log-line:hover{background:var(--bg3);}
+.log-ts{color:var(--text3);}
+.log-info{color:var(--blue);}
+.log-warn{color:var(--amber);}
+.log-err{color:var(--red);}
+.log-ok{color:var(--green);}
+
+/* MISC */
+.divider{height:1px;background:var(--border);margin:.8rem 0;}
+.empty-state{text-align:center;padding:2rem;color:var(--text3);font-size:.78rem;}
+.pill{display:inline-flex;align-items:center;gap:.3rem;padding:2px 7px;border-radius:20px;font-size:.63rem;font-weight:500;font-family:'DM Mono',monospace;}
+.pill-g{background:var(--green-d);color:var(--green);}
+.pill-o{background:var(--orange-d);color:var(--orange);}
+.pill-r{background:var(--red-d);color:var(--red);}
+.pill-b{background:var(--blue-d);color:var(--blue);}
+.pill-t{background:var(--teal-d);color:var(--teal);}
+progress-ring{transform:rotate(-90deg);}
+.sparkline{display:flex;align-items:flex-end;gap:2px;height:30px;}
+.spk-bar{flex:1;background:var(--orange-d);border-radius:2px 2px 0 0;min-width:4px;transition:height .3s;}
+</style>
+<body>
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo"><div class="logo-mark">N</div>NimbusAI<sub>ENTERPRISE</sub></div>
+  <div class="tb-sep"></div>
+  <select class="tb-sel" id="region-sel">
+    <option>us-east-1  N.Virginia</option><option>us-west-2  Oregon</option>
+    <option>eu-west-1  Ireland</option><option>eu-central-1  Frankfurt</option>
+    <option>ap-southeast-1  Singapore</option><option>ap-northeast-1  Tokyo</option>
+  </select>
+  <select class="tb-sel"><option>Production</option><option>Staging</option><option>Development</option><option>DR-Region</option></select>
+  <select class="tb-sel"><option>All Accounts</option><option>123456789012  Main</option><option>234567890123  Security</option><option>345678901234  Shared-Svcs</option></select>
+  <div class="tb-right">
+    <div class="tb-badge tb-green"><div class="blink blink-green"></div>99.7% uptime</div>
+    <div class="tb-badge tb-orange" onclick="showPanel('alerts')"><div class="blink blink-orange"></div>9 alerts</div>
+    <div class="tb-badge tb-red" onclick="showPanel('security')">3 critical</div>
+    <div class="tb-badge tb-blue">$4,284/mo</div>
+    <div class="tb-sep"></div>
+    <div class="tb-avatar" onclick="showPanel('ai')">AI</div>
+  </div>
+</div>
+
+<div class="app">
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sb-section">Overview</div>
+  <div class="ni active" id="nav-dashboard" onclick="showPanel('dashboard')"><span class="ico">⬛</span>Dashboard</div>
+  <div class="ni" id="nav-ai" onclick="showPanel('ai')"><span class="ico">◈</span>AI Command Center<span class="nb nb-o">AI</span></div>
+  <div class="ni" id="nav-alerts" onclick="showPanel('alerts')"><span class="ico">🔔</span>Alerts & Events<span class="nb nb-r">9</span></div>
+
+  <div class="sb-section">Build & Deploy</div>
+  <div class="ni" id="nav-workflows" onclick="showPanel('workflows')"><span class="ico">⟳</span>Workflow Library</div>
+  <div class="ni" id="nav-pipelines" onclick="showPanel('pipelines')"><span class="ico">⇥</span>CI/CD Pipelines</div>
+  <div class="ni" id="nav-iac" onclick="showPanel('iac')"><span class="ico">⌨</span>IaC Studio<span class="nb nb-o">NEW</span></div>
+  <div class="ni" id="nav-terraform" onclick="showPanel('terraform')"><span class="ico">◧</span>Terraform Modules</div>
+
+  <div class="sb-section">Compute</div>
+  <div class="ni" id="nav-ec2" onclick="showPanel('ec2')"><span class="ico">🖥</span>EC2 Manager</div>
+  <div class="ni" id="nav-eks" onclick="showPanel('eks')"><span class="ico">☸</span>EKS / Kubernetes</div>
+  <div class="ni" id="nav-lambda" onclick="showPanel('lambda')"><span class="ico">⚡</span>Lambda Studio</div>
+  <div class="ni" id="nav-fargate" onclick="showPanel('fargate')"><span class="ico">🐳</span>ECS / Fargate</div>
+
+  <div class="sb-section">Data & Storage</div>
+  <div class="ni" id="nav-s3" onclick="showPanel('s3')"><span class="ico">🪣</span>S3 Manager</div>
+  <div class="ni" id="nav-databases" onclick="showPanel('databases')"><span class="ico">🗄</span>Database Studio</div>
+  <div class="ni" id="nav-datapipe" onclick="showPanel('datapipe')"><span class="ico">↔</span>Data Pipelines</div>
+
+  <div class="sb-section">Networking</div>
+  <div class="ni" id="nav-vpc" onclick="showPanel('vpc')"><span class="ico">🕸</span>VPC Designer</div>
+  <div class="ni" id="nav-apigw" onclick="showPanel('apigw')"><span class="ico">⤵</span>API Gateway</div>
+  <div class="ni" id="nav-cdn" onclick="showPanel('cdn')"><span class="ico">🌐</span>CloudFront / CDN</div>
+
+  <div class="sb-section">Security</div>
+  <div class="ni" id="nav-security" onclick="showPanel('security')"><span class="ico">◉</span>Security Hub<span class="nb nb-r">7</span></div>
+  <div class="ni" id="nav-iam" onclick="showPanel('iam')"><span class="ico">🔑</span>IAM Studio</div>
+  <div class="ni" id="nav-compliance" onclick="showPanel('compliance')"><span class="ico">✓</span>Compliance Center</div>
+  <div class="ni" id="nav-waf" onclick="showPanel('waf')"><span class="ico">🛡</span>WAF & Shield</div>
+
+  <div class="sb-section">FinOps</div>
+  <div class="ni" id="nav-finops" onclick="showPanel('finops')"><span class="ico">$</span>Cost Dashboard</div>
+  <div class="ni" id="nav-savings" onclick="showPanel('savings')"><span class="ico">◎</span>Savings Planner</div>
+
+  <div class="sb-section">Observability</div>
+  <div class="ni" id="nav-monitoring" onclick="showPanel('monitoring')"><span class="ico">📊</span>Monitoring Hub</div>
+  <div class="ni" id="nav-logs" onclick="showPanel('logs')"><span class="ico">📋</span>Log Analytics</div>
+  <div class="ni" id="nav-tracing" onclick="showPanel('tracing')"><span class="ico">⬡</span>Distributed Tracing</div>
+
+  <div class="sb-section">Incident & DR</div>
+  <div class="ni" id="nav-incidents" onclick="showPanel('incidents')"><span class="ico">🚨</span>Incident Response</div>
+  <div class="ni" id="nav-dr" onclick="showPanel('dr')"><span class="ico">♻</span>Disaster Recovery</div>
+  <div class="ni" id="nav-runbooks" onclick="showPanel('runbooks')"><span class="ico">📖</span>Runbook Library</div>
+
+  <div class="sb-section">Multi-Cloud</div>
+    <div class="ni" id="nav-multicloud" onclick="showPanel('multicloud')"><span class="ico">🌐</span>Multi-Cloud<span class="nb nb-o">NEW</span></div>
+    <div class="ni" id="nav-azure" onclick="showPanel('azure')"><span class="ico">🔵</span>Azure</div>
+    <div class="ni" id="nav-gcp" onclick="showPanel('gcp')"><span class="ico">🟢</span>Google Cloud</div>
+    <div class="sb-section">Workspace</div>
+  <div class="ni" id="nav-team" onclick="showPanel('team')"><span class="ico">👥</span>Team & Roles</div>
+  <div class="ni" id="nav-audit" onclick="showPanel('audit')"><span class="ico">📝</span>Audit Log</div>
+
+  <div class="sb-footer">
+    <div class="sb-user">
+      <div class="sb-avatar">DA</div>
+      <div class="sb-info"><div class="sb-name">DevOps Admin</div><div class="sb-role">AWS Power User</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT PANELS -->
+<div class="content">
+
+<!-- ═══════════════════════════════════════════════════════════ DASHBOARD -->
+<div class="panel active" id="panel-dashboard">
+<div class="scroll">
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">Infrastructure Command Center</div><div class="ph-sub">Wednesday, Apr 15 2026 · us-east-1 Production · Auto-refresh 30s</div></div>
+    <div class="ph-actions">
+      <button class="btn btn-ghost btn-sm" onclick="ai('Give me a full health summary of my AWS infrastructure. List the top 5 risks and top 3 cost optimizations I should do immediately.')">🔍 AI Health Report</button>
+      <button class="btn btn-primary btn-sm">↺ Refresh</button>
+    </div>
+  </div>
+  <div class="stats-grid stats-4">
+    <div class="stat stat-o"><div class="stat-label">EC2 Instances</div><div class="stat-val s-o">47</div><div class="stat-sub stat-up">▲ 5 launched today</div></div>
+    <div class="stat stat-r"><div class="stat-label">Monthly Spend</div><div class="stat-val s-r">$8,412</div><div class="stat-sub stat-dn">▲ 18% over budget</div></div>
+    <div class="stat stat-g"><div class="stat-label">Services Online</div><div class="stat-val s-g">99.7%</div><div class="stat-sub stat-up">SLA compliant</div></div>
+    <div class="stat stat-r"><div class="stat-label">Security Alerts</div><div class="stat-val s-r">9</div><div class="stat-sub stat-dn">3 critical, 6 high</div></div>
+  </div>
+  <div class="stats-grid stats-4">
+    <div class="stat stat-b"><div class="stat-label">Lambda Invocations</div><div class="stat-val s-b">2.4M</div><div class="stat-sub stat-up">today</div></div>
+    <div class="stat stat-t"><div class="stat-label">S3 Buckets</div><div class="stat-val s-t">34</div><div class="stat-sub stat-dn">2 public ⚠</div></div>
+    <div class="stat stat-p"><div class="stat-label">Active Pipelines</div><div class="stat-val s-p">12</div><div class="stat-sub">8 passing, 4 building</div></div>
+    <div class="stat stat-o"><div class="stat-label">RDS Instances</div><div class="stat-val s-o">8</div><div class="stat-sub">6 multi-AZ</div></div>
+  </div>
+  <div class="grid-lr">
+    <div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">⚡ Top EC2 by Cost</div><button class="btn btn-ghost btn-sm" onclick="ai('Analyze my EC2 fleet and recommend right-sizing for each instance based on CPU and memory utilization. Provide potential monthly savings.')">AI Right-size ↗</button></div>
+        <div class="card-body"><table class="tbl"><tr><th>Instance</th><th>Type</th><th>CPU</th><th>Status</th><th>$/mo</th></tr>
+          <tr><td class="mono">prod-api-001</td><td class="mono">c5.2xl</td><td><span style="color:var(--orange)">91%</span></td><td><span class="sdot sd-g"></span>Running</td><td class="s-r">$280</td></tr>
+          <tr><td class="mono">prod-worker-02</td><td class="mono">m5.xl</td><td>74%</td><td><span class="sdot sd-g"></span>Running</td><td>$140</td></tr>
+          <tr><td class="mono">staging-app-01</td><td class="mono">t3.lg</td><td>34%</td><td><span class="sdot sd-g"></span>Running</td><td>$60</td></tr>
+          <tr><td class="mono">dev-test-03</td><td class="mono">t3.micro</td><td><span style="color:var(--red)">2%</span></td><td><span class="sdot sd-o"></span>Idle</td><td class="s-r">$8</td></tr>
+          <tr><td class="mono">old-batch-job</td><td class="mono">t3.sm</td><td>0%</td><td><span class="sdot sd-r"></span>Stopped</td><td class="s-r">$12</td></tr>
+        </table></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">⟳ Active Deployments</div><button class="btn btn-ghost btn-sm" onclick="showPanel('pipelines')">View All</button></div>
+        <div class="card-body"><table class="tbl"><tr><th>Pipeline</th><th>Branch</th><th>Stage</th><th>Status</th><th>Time</th></tr>
+          <tr><td class="mono">prod-api</td><td class="mono">main</td><td>Deploy ECS</td><td><span class="badge bg-g">PASSING</span></td><td class="s-t">2m ago</td></tr>
+          <tr><td class="mono">data-proc</td><td class="mono">release</td><td>Test</td><td><span class="badge bg-o">BUILDING</span></td><td>5m ago</td></tr>
+          <tr><td class="mono">auth-svc</td><td class="mono">hotfix</td><td>Approval</td><td><span class="badge bg-b">WAITING</span></td><td>12m ago</td></tr>
+          <tr><td class="mono">ml-pipeline</td><td class="mono">main</td><td>Deploy</td><td><span class="badge bg-r">FAILED</span></td><td class="s-r">18m ago</td></tr>
+        </table></div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">🔔 Latest Alerts</div><button class="btn btn-ghost btn-sm" onclick="showPanel('alerts')">All</button></div>
+        <div class="card-body" style="padding:.5rem;">
+          <div class="alert-feed">
+            <div class="alert-item alert-crit" onclick="ai('My Lambda function data-pipeline has an 8.7% error rate. Help me debug this. What are the most common causes and how do I investigate with CloudWatch Logs Insights?')"><div class="ai-icon">🔴</div><div><div class="ai-title">Lambda error spike</div><div class="ai-desc">data-pipeline: 8.7% errors</div></div><div class="ai-time">3m</div></div>
+            <div class="alert-item alert-crit" onclick="ai('S3 bucket dev-uploads-test is publicly accessible. Generate the AWS CLI commands to immediately block all public access and add encryption.')"><div class="ai-icon">🔴</div><div><div class="ai-title">Public S3 bucket</div><div class="ai-desc">dev-uploads-test exposed</div></div><div class="ai-time">11m</div></div>
+            <div class="alert-item alert-warn" onclick="ai('My EC2 instance prod-api-001 CPU has been above 85% for 20 minutes. What actions should I take? Should I scale up, scale out, or is there another issue?')"><div class="ai-icon">🟠</div><div><div class="ai-title">High CPU: prod-api-001</div><div class="ai-desc">91% for 20+ minutes</div></div><div class="ai-time">20m</div></div>
+            <div class="alert-item alert-warn" onclick="ai('My AWS bill is 18% over budget this month. Identify the top cost drivers and give me immediate actions to reduce spend.')"><div class="ai-icon">🟠</div><div><div class="ai-title">Budget exceeded 18%</div><div class="ai-desc">$8,412 vs $7,100 budget</div></div><div class="ai-time">1h</div></div>
+            <div class="alert-item alert-info" onclick="ai('An IAM user dev01 has AdministratorAccess attached directly. Generate a least-privilege replacement policy for a developer role.')"><div class="ai-icon">🔵</div><div><div class="ai-title">IAM policy warning</div><div class="ai-desc">dev01 has AdminAccess</div></div><div class="ai-time">2h</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:.8rem;">
+        <div class="card-head"><div class="card-title">💸 Cost by Service</div><button class="btn btn-ghost btn-sm" onclick="showPanel('finops')">FinOps ↗</button></div>
+        <div class="card-body">
+          <div class="cbar"><div class="cbar-top"><span class="cbar-label">EC2</span><span class="cbar-val">$3,820</span></div><div class="cbar-track"><div class="cbar-fill" style="width:45%;background:var(--orange)"></div></div></div>
+          <div class="cbar"><div class="cbar-top"><span class="cbar-label">RDS / Aurora</span><span class="cbar-val">$1,640</span></div><div class="cbar-track"><div class="cbar-fill" style="width:19%;background:var(--blue)"></div></div></div>
+          <div class="cbar"><div class="cbar-top"><span class="cbar-label">EKS</span><span class="cbar-val">$1,200</span></div><div class="cbar-track"><div class="cbar-fill" style="width:14%;background:var(--teal)"></div></div></div>
+          <div class="cbar"><div class="cbar-top"><span class="cbar-label">Data Transfer</span><span class="cbar-val">$720</span></div><div class="cbar-track"><div class="cbar-fill" style="width:8%;background:var(--purple)"></div></div></div>
+          <div class="cbar"><div class="cbar-top"><span class="cbar-label">S3 + CloudFront</span><span class="cbar-val">$580</span></div><div class="cbar-track"><div class="cbar-fill" style="width:6%;background:var(--green)"></div></div></div>
+          <div class="cbar"><div class="cbar-top"><span class="cbar-label">Lambda + API GW</span><span class="cbar-val">$452</span></div><div class="cbar-track"><div class="cbar-fill" style="width:5%;background:var(--amber)"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ AI COMMAND CENTER -->
+<div class="panel" id="panel-ai">
+<div class="chat-wrap">
+  <div class="chat-bar">
+    <div class="chat-title">◈ AI Command Center <span class="badge bg-t" style="font-size:.6rem">Claude Sonnet · AWS Expert Mode</span></div>
+    <div style="display:flex;gap:.5rem;"><button class="btn btn-ghost btn-sm" onclick="clearChat()">Clear</button><button class="btn btn-ghost btn-sm" onclick="ai('Export a summary of our AWS architecture as a markdown document with all services, costs, security findings, and recommendations.')">Export Report ↗</button></div>
+  </div>
+  <div class="chat-msgs" id="chat-messages">
+    <div class="cm cm-ai"><div class="cm-av">AI</div><div class="cm-body"><div class="cm-who">NimbusAI Assistant</div>
+    <div class="cm-text">Welcome to <strong>NimbusAI Command Center</strong>. I'm your expert AWS DevOps engineer, solutions architect, and FinOps specialist — all in one.<br><br>
+    I can instantly help you with:<br>
+    • <strong>Infrastructure automation</strong> — CloudFormation, Terraform, CDK, Pulumi<br>
+    • <strong>CI/CD pipelines</strong> — CodePipeline, GitHub Actions, GitLab CI, ArgoCD<br>
+    • <strong>Cost optimization</strong> — Savings Plans, right-sizing, Reserved Instances, waste elimination<br>
+    • <strong>Security & compliance</strong> — IAM least privilege, SOC2, PCI-DSS, HIPAA, CIS benchmarks<br>
+    • <strong>Kubernetes & containers</strong> — EKS setup, Helm charts, service mesh, GitOps<br>
+    • <strong>Serverless</strong> — Lambda architectures, event-driven design, Step Functions<br>
+    • <strong>Disaster recovery</strong> — RTO/RPO planning, multi-region failover, backup strategies<br>
+    • <strong>Observability</strong> — CloudWatch, Grafana, Datadog, OpenTelemetry, X-Ray<br><br>
+    What would you like to build or optimize today?</div></div></div>
+  </div>
+  <div class="chat-foot">
+    <div class="chat-inp-row">
+      <input class="chat-inp" id="chat-input" placeholder="Ask anything about AWS infrastructure, automation, architecture, or cost optimization..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){sendChat();event.preventDefault();}"/>
+      <button class="chat-send" onclick="sendChat()">↑</button>
+    </div>
+    <div class="qp-row">
+      <span class="qp" onclick="fill('Write a production-ready CloudFormation template for a 3-tier web app with VPC, ALB, Auto Scaling, RDS Multi-AZ, ElastiCache, WAF, and CloudFront')">3-tier CFN stack</span>
+      <span class="qp" onclick="fill('Create a complete Terraform module for EKS cluster with managed node groups, IRSA, cluster autoscaler, AWS Load Balancer Controller, and EBS CSI driver')">EKS Terraform</span>
+      <span class="qp" onclick="fill('Build a Lambda function and EventBridge schedule to auto-stop idle EC2 instances under 5% CPU for 2 hours and send SNS notification')">Auto-stop EC2</span>
+      <span class="qp" onclick="fill('Design a multi-region active-active architecture for a high-traffic API with Route53 latency routing, DynamoDB Global Tables, and ECS Fargate')">Multi-region arch</span>
+      <span class="qp" onclick="fill('Audit my IAM setup and generate least-privilege policies for: developer, data scientist, devops engineer, and read-only auditor roles')">IAM role policies</span>
+      <span class="qp" onclick="fill('Create a complete GitOps pipeline with ArgoCD on EKS, GitHub Actions for CI, ECR for images, and Slack notifications')">GitOps pipeline</span>
+      <span class="qp" onclick="fill('Write Step Functions workflow for an order processing system with Lambda functions, SQS, DynamoDB, and error handling with retry logic')">Step Functions</span>
+      <span class="qp" onclick="fill('Design a data lake architecture on AWS: S3 landing zone, Glue crawlers, Athena queries, Lake Formation permissions, and QuickSight dashboards')">Data Lake design</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ WORKFLOWS -->
+<div class="panel" id="panel-workflows">
+<div class="scroll">
+  <div class="ph"><div class="ph-left"><div class="ph-title">Workflow Library</div><div class="ph-sub">50+ pre-built automation workflows — click any card to generate complete implementation</div></div>
+  <div class="ph-actions"><button class="btn btn-ghost btn-sm" onclick="ai('Build a custom workflow for auto-scaling ECS Fargate based on SQS queue depth with custom CloudWatch metrics, step scaling policies, and Slack notifications')">+ Custom Workflow</button><button class="btn btn-primary btn-sm">Browse All</button></div></div>
+
+  <div style="font-size:.75rem;font-weight:700;color:var(--text2);margin:.4rem 0 .6rem;text-transform:uppercase;letter-spacing:.08em;">🚀 Deploy & Release</div>
+  <div class="wf-grid">
+    <div class="wfc wfc-orange" onclick="ai('Write a complete blue/green deployment workflow for ECS Fargate using CodeDeploy with: target group switching, Lambda lifecycle hooks for smoke tests, automatic rollback on failure, and CloudFormation template for the entire setup')"><div class="wfc-ico">🔵</div><div class="wfc-name">Blue/Green ECS Deployment</div><div class="wfc-desc">Zero-downtime with automatic rollback, health checks, and approval gates</div><div class="wfc-tags"><span class="wfc-tag wt-o">ECS</span><span class="wfc-tag wt-b">CodeDeploy</span><span class="wfc-tag wt-g">ALB</span></div></div>
+    <div class="wfc wfc-teal" onclick="ai('Create a complete GitOps workflow with ArgoCD on EKS: GitHub Actions CI pipeline, ECR image push, ArgoCD application definition, Helm chart structure, progressive delivery with Argo Rollouts, and Slack deploy notifications. Include all YAML manifests.')"><div class="wfc-ico">♻</div><div class="wfc-name">GitOps with ArgoCD</div><div class="wfc-desc">GitHub Actions → ECR → ArgoCD → EKS with progressive delivery and rollback</div><div class="wfc-tags"><span class="wfc-tag wt-t">ArgoCD</span><span class="wfc-tag wt-b">EKS</span><span class="wfc-tag wt-g">Helm</span></div></div>
+    <div class="wfc wfc-blue" onclick="ai('Build a serverless deployment pipeline using AWS SAM: GitHub Actions workflow, SAM build and package, multi-environment promotion (dev→staging→prod) with manual approval, canary deployments via Lambda aliases with traffic shifting, and automated rollback')"><div class="wfc-ico">⚡</div><div class="wfc-name">Serverless SAM Pipeline</div><div class="wfc-desc">SAM + GitHub Actions with canary deployments and Lambda alias traffic shifting</div><div class="wfc-tags"><span class="wfc-tag wt-o">SAM</span><span class="wfc-tag wt-b">Lambda</span><span class="wfc-tag wt-g">GitHub Actions</span></div></div>
+    <div class="wfc wfc-green" onclick="ai('Create a multi-environment Terraform deployment workflow using GitHub Actions: Terraform Cloud remote state, workspace-per-environment strategy, drift detection on schedule, cost estimation with Infracost, security scanning with tfsec/checkov, and PR plan comments')"><div class="wfc-ico">◧</div><div class="wfc-name">Terraform GitOps Pipeline</div><div class="wfc-desc">Multi-environment Terraform with drift detection, Infracost, and security scanning</div><div class="wfc-tags"><span class="wfc-tag wt-t">Terraform</span><span class="wfc-tag wt-o">GitHub Actions</span></div></div>
+    <div class="wfc wfc-purple" onclick="ai('Design a database schema migration workflow: Flyway/Liquibase integration, pre-migration backup Lambda, blue/green database migration pattern, read replica promotion, connection string update via Secrets Manager rotation, rollback procedure, and zero-downtime cutover runbook')"><div class="wfc-ico">🗄</div><div class="wfc-name">Database Migration Pipeline</div><div class="wfc-desc">Zero-downtime schema migrations with automated backups and rollback procedures</div><div class="wfc-tags"><span class="wfc-tag wt-b">RDS</span><span class="wfc-tag wt-o">Flyway</span><span class="wfc-tag wt-g">Lambda</span></div></div>
+    <div class="wfc wfc-orange" onclick="ai('Build a container security pipeline: ECR image scanning with detailed CVE reports, Lambda function to block deployments of images with CRITICAL vulnerabilities, GitHub Actions integration, SBOM generation with Syft, OPA policy enforcement, and Slack security alerts')"><div class="wfc-ico">🔒</div><div class="wfc-name">Container Security Gate</div><div class="wfc-desc">ECR scanning blocks critical CVEs, SBOM generation, OPA policy enforcement</div><div class="wfc-tags"><span class="wfc-tag wt-r">Security</span><span class="wfc-tag wt-o">ECR</span><span class="wfc-tag wt-b">OPA</span></div></div>
+  </div>
+
+  <div class="divider"></div>
+  <div style="font-size:.75rem;font-weight:700;color:var(--text2);margin:.4rem 0 .6rem;text-transform:uppercase;letter-spacing:.08em;">🛡 Security & Compliance</div>
+  <div class="wf-grid">
+    <div class="wfc wfc-red" onclick="ai('Build an automated AWS security remediation system using AWS Config + Lambda: detect and auto-fix public S3 buckets, missing MFA, open SSH security groups, unencrypted EBS volumes, exposed access keys. Include CloudFormation for all Config rules, Lambda functions, SNS notifications, and IAM roles.')"><div class="wfc-ico">🛡</div><div class="wfc-name">Auto-Remediation Engine</div><div class="wfc-desc">AWS Config + Lambda auto-fixes misconfigs: public S3, open ports, missing encryption</div><div class="wfc-tags"><span class="wfc-tag wt-r">Config</span><span class="wfc-tag wt-o">Lambda</span><span class="wfc-tag wt-b">SNS</span></div></div>
+    <div class="wfc wfc-orange" onclick="ai('Create a complete SOC2 compliance automation framework on AWS: CloudTrail for all regions, Config conformance packs for SOC2, Security Hub standards, automated evidence collection Lambda, weekly compliance report via SES, GuardDuty integration, and an audit-ready S3 evidence bucket. Include all CloudFormation.')"><div class="wfc-ico">📋</div><div class="wfc-name">SOC2 Compliance Automation</div><div class="wfc-desc">Automated evidence collection, conformance packs, and audit-ready reporting</div><div class="wfc-tags"><span class="wfc-tag wt-o">Security Hub</span><span class="wfc-tag wt-b">Config</span></div></div>
+    <div class="wfc wfc-teal" onclick="ai('Design a Zero Trust network architecture on AWS: no-trust VPC design, Private Link for all service communication, IAM Roles Anywhere for on-prem, Verified Access for application access without VPN, network firewall rules, and VPC flow log anomaly detection with ML. Include Terraform.')"><div class="wfc-ico">🔐</div><div class="wfc-name">Zero Trust Architecture</div><div class="wfc-desc">Private Link, IAM Roles Anywhere, Verified Access — no implicit trust anywhere</div><div class="wfc-tags"><span class="wfc-tag wt-t">PrivateLink</span><span class="wfc-tag wt-b">WAF</span></div></div>
+    <div class="wfc wfc-blue" onclick="ai('Build a secrets rotation automation system: AWS Secrets Manager rotation Lambdas for RDS, Redis, API keys, and custom credentials. Multi-account secrets replication, emergency break-glass procedure, audit logging to CloudTrail, and Slack alerts for rotation failures. Include all Lambda code.')"><div class="wfc-ico">🔄</div><div class="wfc-name">Secrets Rotation Automation</div><div class="wfc-desc">Automated rotation for RDS, Redis, API keys with multi-account replication</div><div class="wfc-tags"><span class="wfc-tag wt-o">Secrets Mgr</span><span class="wfc-tag wt-b">Lambda</span></div></div>
+    <div class="wfc wfc-purple" onclick="ai('Create a threat detection and automated response system: GuardDuty findings trigger EventBridge → Lambda response playbooks (isolate EC2, revoke IAM credentials, block IP in WAF, snapshot EBS for forensics). Include SNS PagerDuty integration and incident ticket creation via Lambda.')"><div class="wfc-ico">🚨</div><div class="wfc-name">Threat Detection & Response</div><div class="wfc-desc">GuardDuty → EventBridge → Lambda playbooks: isolate, block, snapshot for forensics</div><div class="wfc-tags"><span class="wfc-tag wt-r">GuardDuty</span><span class="wfc-tag wt-o">Lambda</span></div></div>
+    <div class="wfc wfc-red" onclick="ai('Build a HIPAA compliance infrastructure on AWS: encryption at rest and in transit for all services, VPC with no internet access for PHI, CloudHSM for key management, CloudTrail with integrity validation, comprehensive audit logging, BAA-eligible services only, and a HIPAA compliance checklist with CloudFormation.')"><div class="wfc-ico">🏥</div><div class="wfc-name">HIPAA Infrastructure</div><div class="wfc-desc">PHI-safe architecture: CloudHSM, encrypted VPC, audit trails, BAA-eligible services</div><div class="wfc-tags"><span class="wfc-tag wt-r">HIPAA</span><span class="wfc-tag wt-o">CloudHSM</span></div></div>
+  </div>
+
+  <div class="divider"></div>
+  <div style="font-size:.75rem;font-weight:700;color:var(--text2);margin:.4rem 0 .6rem;text-transform:uppercase;letter-spacing:.08em;">💰 Cost & FinOps</div>
+  <div class="wf-grid">
+    <div class="wfc wfc-green" onclick="ai('Create a comprehensive AWS cost optimization bot: Lambda function using Cost Explorer API to identify top 10 cost drivers weekly, unused resources (idle EC2, unattached EBS, old snapshots, unused Elastic IPs), Savings Plan purchase recommendations, and send HTML email report via SES with charts. Include all code.')"><div class="wfc-ico">🤖</div><div class="wfc-name">Weekly Cost Optimizer Bot</div><div class="wfc-desc">Scans for waste, recommends Savings Plans, emails HTML cost report with charts</div><div class="wfc-tags"><span class="wfc-tag wt-g">Cost Explorer</span><span class="wfc-tag wt-o">Lambda</span></div></div>
+    <div class="wfc wfc-teal" onclick="ai('Build an AWS instance scheduler: Lambda functions with DynamoDB schedule store, tag-based EC2/RDS start-stop, timezone support, holiday calendar, override mechanism, Slack commands to extend schedules, cost savings reporting. Include CDK code and Slack bot Lambda.')"><div class="wfc-ico">⏰</div><div class="wfc-name">Instance Scheduler</div><div class="wfc-desc">Tag-based EC2/RDS start/stop with timezone support and Slack override commands</div><div class="wfc-tags"><span class="wfc-tag wt-t">EC2</span><span class="wfc-tag wt-b">RDS</span><span class="wfc-tag wt-g">Slack</span></div></div>
+    <div class="wfc wfc-orange" onclick="ai('Design a multi-account AWS cost allocation system: tag enforcement SCPs, Cost Anomaly Detection alerts, per-team budget alarms with SNS, chargeback report generation via Lambda and Athena, Quicksight dashboard for team cost visibility, and a tag compliance checker. Include all CloudFormation.')"><div class="wfc-ico">📊</div><div class="wfc-name">Cost Chargeback System</div><div class="wfc-desc">Tag enforcement, per-team budgets, anomaly detection, chargeback QuickSight dashboards</div><div class="wfc-tags"><span class="wfc-tag wt-o">Organizations</span><span class="wfc-tag wt-b">Athena</span></div></div>
+  </div>
+
+  <div class="divider"></div>
+  <div style="font-size:.75rem;font-weight:700;color:var(--text2);margin:.4rem 0 .6rem;text-transform:uppercase;letter-spacing:.08em;">🔄 Data & Analytics</div>
+  <div class="wf-grid">
+    <div class="wfc wfc-blue" onclick="ai('Build a complete real-time data streaming pipeline on AWS: Kinesis Data Streams for ingestion, Kinesis Data Firehose to S3, Lambda for transformation, Glue for schema detection, Athena for queries, and QuickSight for live dashboards. Include CDK infrastructure and sample producer/consumer Lambda code.')"><div class="wfc-ico">🌊</div><div class="wfc-name">Real-time Streaming Pipeline</div><div class="wfc-desc">Kinesis → Firehose → S3 → Glue → Athena → QuickSight end-to-end pipeline</div><div class="wfc-tags"><span class="wfc-tag wt-b">Kinesis</span><span class="wfc-tag wt-o">Glue</span></div></div>
+    <div class="wfc wfc-purple" onclick="ai('Create an ML model deployment workflow on AWS: SageMaker training pipeline, model registry with approval workflow, blue/green endpoint deployment, A/B testing with traffic splitting, model monitoring for data drift, automatic retraining trigger via EventBridge, and CloudFormation for the entire MLOps platform.')"><div class="wfc-ico">🧠</div><div class="wfc-name">MLOps Pipeline</div><div class="wfc-desc">SageMaker training → registry → A/B deployment → drift monitoring → auto-retrain</div><div class="wfc-tags"><span class="wfc-tag wt-p">SageMaker</span><span class="wfc-tag wt-b">EventBridge</span></div></div>
+    <div class="wfc wfc-teal" onclick="ai('Design a data lake architecture on AWS: S3 with intelligent tiering, Lake Formation for fine-grained permissions, Glue Data Catalog, Glue ETL jobs in PySpark, Athena workgroups per team, S3 Access Points, cross-account data sharing, and cost optimization with S3 lifecycle policies. Include all Terraform code.')"><div class="wfc-ico">🏔</div><div class="wfc-name">Enterprise Data Lake</div><div class="wfc-desc">S3 + Lake Formation + Glue + Athena with fine-grained access control and governance</div><div class="wfc-tags"><span class="wfc-tag wt-t">Lake Formation</span><span class="wfc-tag wt-o">Glue</span></div></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ CI/CD PIPELINES -->
+<div class="panel" id="panel-pipelines">
+<div class="pipe-wrap">
+  <div class="pipe-toolbar">
+    <div style="font-size:.82rem;font-weight:700;flex:1;">CI/CD Pipeline Builder</div>
+    <button class="btn btn-ghost btn-sm" onclick="ai('Generate a complete AWS CodePipeline definition in JSON/YAML for a Node.js microservice: GitHub source, CodeBuild for test and build, ECR push, ECS Fargate blue/green deploy with CodeDeploy, Slack notification Lambda, and manual approval for production.')">Generate Pipeline ↗</button>
+    <button class="btn btn-ghost btn-sm" onclick="ai('Create a GitHub Actions workflow YAML for a Python application deploying to AWS Lambda: install deps, run pytest, check coverage threshold, package with SAM, deploy to dev on push, deploy to prod on tag, with OIDC authentication (no long-lived AWS keys).')">GitHub Actions ↗</button>
+    <button class="btn btn-ghost btn-sm" onclick="ai('Write a GitLab CI/CD pipeline for a Java Spring Boot app deploying to ECS Fargate: Maven build, SonarQube scan, Docker build, ECR push, CloudFormation update, integration tests, and rollback job.')">GitLab CI ↗</button>
+    <button class="btn btn-primary btn-sm">+ New Pipeline</button>
+  </div>
+  <div class="pipe-canvas">
+    <div class="pipe-stage">
+      <div class="ps-head"><div class="ps-name">① Source</div><span class="badge bg-g">Connected</span></div>
+      <div class="ps-actions">
+        <div class="ps-action" onclick="ai('Configure CodePipeline GitHub v2 connection with OIDC, webhook triggers, branch filters, pull request events, and monorepo path filters. Include the CloudFormation resource definition.')"><div class="psa-icon">⬡</div><div class="psa-name">GitHub v2</div><div class="psa-type">CodeConnection</div></div>
+        <div class="ps-action" onclick="ai('Set up CodeCommit repository with branch policies, approval rule templates, pull request notifications via SNS, and migration from GitHub. Include the IAM policies and CloudFormation.')"><div class="psa-icon">📁</div><div class="psa-name">CodeCommit</div><div class="psa-type">Source</div></div>
+        <div class="ps-action" onclick="ai('Configure S3 as a CodePipeline source with versioning, EventBridge trigger on object upload, and cross-account bucket access. Include the bucket policy and pipeline action definition.')"><div class="psa-icon">🪣</div><div class="psa-name">S3 Bucket</div><div class="psa-type">Source</div></div>
+        <div class="ps-action" onclick="ai('Set up ECR as CodePipeline source trigger — when a new image tag is pushed, automatically trigger a pipeline run. Include EventBridge rule and pipeline definition.')"><div class="psa-icon">🐳</div><div class="psa-name">ECR Image</div><div class="psa-type">Trigger</div></div>
+      </div>
+    </div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-stage">
+      <div class="ps-head"><div class="ps-name">② Build & Test</div><span class="badge bg-o">2 actions</span></div>
+      <div class="ps-actions">
+        <div class="ps-action" onclick="ai('Write a CodeBuild buildspec.yml for a Node.js app: npm install, ESLint, Jest with coverage report, Docker build, ECR push with multi-arch (amd64/arm64) using BuildKit, Trivy security scan, and SBOM generation. Include the CodeBuild project CloudFormation.')"><div class="psa-icon">⚙</div><div class="psa-name">CodeBuild</div><div class="psa-type">Build + Test</div></div>
+        <div class="ps-action" onclick="ai('Integrate SonarQube into CodePipeline using CodeBuild: SonarScanner setup, quality gate enforcement (fail build if gate fails), coverage upload, and results posted as PR comment via GitHub API.')"><div class="psa-icon">🔍</div><div class="psa-name">SonarQube Scan</div><div class="psa-type">Quality Gate</div></div>
+        <div class="ps-action" onclick="ai('Add SAST security scanning to CodePipeline: Semgrep for code analysis, Checkov for IaC scanning, Snyk for dependency vulnerabilities, results to Security Hub, and pipeline blocking on HIGH/CRITICAL findings. Include CodeBuild buildspec.')"><div class="psa-icon">🛡</div><div class="psa-name">SAST Security</div><div class="psa-type">Semgrep + Checkov</div></div>
+        <div class="ps-action" onclick="ai('Configure Infracost in CodePipeline: run cost estimate on each Terraform plan, post cost diff as PR comment, block pipeline if monthly cost increase exceeds $500, and save cost history to S3. Include CodeBuild buildspec and IAM policies.')"><div class="psa-icon">💲</div><div class="psa-name">Cost Estimation</div><div class="psa-type">Infracost</div></div>
+      </div>
+    </div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-stage">
+      <div class="ps-head"><div class="ps-name">③ Staging Deploy</div><span class="badge bg-b">Auto</span></div>
+      <div class="ps-actions">
+        <div class="ps-action" onclick="ai('Deploy to ECS Fargate staging via CodeDeploy: task definition update, blue/green deployment, 5-minute traffic shifting window, automated smoke test Lambda, rollback trigger, and CloudWatch alarm integration. Include all YAML and CloudFormation.')"><div class="psa-icon">🐳</div><div class="psa-name">ECS Fargate</div><div class="psa-type">Blue/Green</div></div>
+        <div class="ps-action" onclick="ai('Set up CodeDeploy Lambda deployment: canary 10% traffic for 5 minutes, CloudWatch alarm hooks for automatic rollback, pre/post traffic Lambda hooks for smoke tests, and deployment notifications to Slack. Include the AppSpec and CloudFormation.')"><div class="psa-icon">⚡</div><div class="psa-name">Lambda Canary</div><div class="psa-type">10% → 100%</div></div>
+        <div class="ps-action" onclick="ai('Run integration tests against staging environment in CodePipeline: Newman for API tests, Playwright for E2E tests, performance test with k6, results to S3 and test report in CodeBuild. Fail pipeline if any test suite fails.')"><div class="psa-icon">🧪</div><div class="psa-name">Integration Tests</div><div class="psa-type">Newman + Playwright</div></div>
+      </div>
+    </div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-stage">
+      <div class="ps-head"><div class="ps-name">④ Production Approval</div><span class="badge bg-o">Manual Gate</span></div>
+      <div class="ps-actions">
+        <div class="ps-action" onclick="ai('Configure CodePipeline manual approval with: SNS email and Slack notification with deployment summary (what changed, test results, cost delta), approval URL in notification, auto-reject after 24h timeout, and required approver IAM group.')"><div class="psa-icon">👤</div><div class="psa-name">Manual Approval</div><div class="psa-type">Human Gate</div></div>
+        <div class="ps-action" onclick="ai('Build a change management Lambda that auto-approves CodePipeline if: all tests pass, no security findings, cost increase under $100, and it is not a Friday deployment. Otherwise requires manual approval. Include the Lambda and EventBridge rule.')"><div class="psa-icon">🤖</div><div class="psa-name">Auto-Approval Bot</div><div class="psa-type">Policy-Based</div></div>
+        <div class="ps-action" onclick="ai('Create a deployment notification system: pre-deployment Slack announcement with PR list and author, real-time pipeline status updates via Slack app, post-deployment success/failure message with rollback link, and PagerDuty alert on failure.')"><div class="psa-icon">🔔</div><div class="psa-name">Slack Notifications</div><div class="psa-type">Full Lifecycle</div></div>
+      </div>
+    </div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-stage">
+      <div class="ps-head"><div class="ps-name">⑤ Production Deploy</div><span class="badge bg-g">Live</span></div>
+      <div class="ps-actions">
+        <div class="ps-action" onclick="ai('Production ECS Fargate deployment with CodeDeploy: linear traffic shifting over 30 minutes, CloudWatch alarms for auto-rollback on error rate spike, post-deployment Lambda for cache warming, deployment window enforcement (no deploys on Friday), and full audit log.')"><div class="psa-icon">🚀</div><div class="psa-name">Prod ECS Deploy</div><div class="psa-type">Linear Traffic Shift</div></div>
+        <div class="ps-action" onclick="ai('Create post-deployment validation: synthetic canary tests using CloudWatch Synthetics, Datadog monitor evaluation, SLO error budget check, automated rollback if p99 latency spikes above threshold, and deployment success notification with metrics summary.')"><div class="psa-icon">✅</div><div class="psa-name">Health Validation</div><div class="psa-type">Synthetics + SLO</div></div>
+        <div class="ps-action" onclick="ai('Build automatic rollback system: CloudWatch composite alarms watching error rate, p99 latency, 5xx responses, and ECS task health. If alarm triggers within 15 mins of deploy, auto-invoke CodeDeploy rollback and page on-call engineer via PagerDuty.')"><div class="psa-icon">↩</div><div class="psa-name">Auto Rollback</div><div class="psa-type">Alarm-Triggered</div></div>
+      </div>
+    </div>
+    <div class="add-stage-btn" onclick="ai('What additional pipeline stages would you recommend for a production-grade CI/CD pipeline? Suggest stages for performance testing, feature flags, database migrations, and multi-region deployments.')">+ Add Stage</div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ IaC STUDIO -->
+<div class="panel" id="panel-iac">
+<div class="iac-layout">
+  <div class="iac-col">
+    <div class="iac-head">Services</div>
+    <div class="iac-scroll" id="iac-services">
+      <div class="svc-btn active" id="isvc-ec2" onclick="iacSelect('ec2')"><span class="si">🖥</span><div><div class="sn">EC2 & ASG</div><div class="sd">Compute</div></div></div>
+      <div class="svc-btn" id="isvc-vpc" onclick="iacSelect('vpc')"><span class="si">🕸</span><div><div class="sn">VPC & Networking</div><div class="sd">Network</div></div></div>
+      <div class="svc-btn" id="isvc-ecs" onclick="iacSelect('ecs')"><span class="si">🐳</span><div><div class="sn">ECS Fargate</div><div class="sd">Containers</div></div></div>
+      <div class="svc-btn" id="isvc-eks" onclick="iacSelect('eks')"><span class="si">☸</span><div><div class="sn">EKS Cluster</div><div class="sd">Kubernetes</div></div></div>
+      <div class="svc-btn" id="isvc-rds" onclick="iacSelect('rds')"><span class="si">🗄</span><div><div class="sn">RDS / Aurora</div><div class="sd">Database</div></div></div>
+      <div class="svc-btn" id="isvc-lambda" onclick="iacSelect('lambda')"><span class="si">⚡</span><div><div class="sn">Lambda</div><div class="sd">Serverless</div></div></div>
+      <div class="svc-btn" id="isvc-s3" onclick="iacSelect('s3')"><span class="si">🪣</span><div><div class="sn">S3 & CloudFront</div><div class="sd">Storage + CDN</div></div></div>
+      <div class="svc-btn" id="isvc-iam" onclick="iacSelect('iam')"><span class="si">🔑</span><div><div class="sn">IAM Roles</div><div class="sd">Identity</div></div></div>
+      <div class="svc-btn" id="isvc-cw" onclick="iacSelect('cw')"><span class="si">📊</span><div><div class="sn">CloudWatch</div><div class="sd">Monitoring</div></div></div>
+    </div>
+  </div>
+  <div class="iac-col">
+    <div class="iac-head" id="iac-action-title">EC2 & ASG Actions
+      <div style="display:flex;gap:.3rem;">
+        <span class="badge bg-o" style="cursor:pointer" onclick="iacFormat('cfn')">CFN</span>
+        <span class="badge bg-t" style="cursor:pointer" onclick="iacFormat('terraform')">TF</span>
+        <span class="badge bg-b" style="cursor:pointer" onclick="iacFormat('cdk')">CDK</span>
+        <span class="badge bg-p" style="cursor:pointer" onclick="iacFormat('pulumi')">Pulumi</span>
+      </div>
+    </div>
+    <div class="iac-scroll" id="iac-actions"></div>
+  </div>
+  <div class="code-view">
+    <div class="code-head"><span id="code-filename">Select a service and action to generate code</span>
+      <div style="display:flex;gap:.4rem;"><button class="btn btn-ghost btn-sm" onclick="copyCode()">Copy</button><button class="btn btn-ghost btn-sm" onclick="ai('Explain the generated code and suggest improvements for production use')">Explain ↗</button></div>
+    </div>
+    <div class="code-body" id="code-output">
+<span class="cm"># Select a service from the left panel and click an action</span>
+<span class="cm"># Code will be generated here in your chosen format</span>
+<span class="cm"># Supports: CloudFormation · Terraform · CDK (Python/TS) · Pulumi</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ TERRAFORM MODULES -->
+<div class="panel" id="panel-terraform">
+<div class="scroll">
+  <div class="ph"><div class="ph-left"><div class="ph-title">Terraform Module Library</div><div class="ph-sub">Production-ready modules with best practices baked in — click to generate</div></div>
+  <button class="btn btn-primary btn-sm" onclick="ai('Create a Terraform module structure with: variables.tf, outputs.tf, main.tf, versions.tf, and a complete README.md. Show me the best practices for module design including input validation, sensible defaults, and example usage.')">Module Template ↗</button></div>
+  <div class="wf-grid">
+    <div class="wfc wfc-orange" onclick="ai('Write a production Terraform module for a VPC: public/private/database subnets across 3 AZs, NAT gateways (HA option), VPC flow logs, DHCP options, VPC endpoints for S3 and DynamoDB, DNS settings. All with variables, outputs, and complete README.')"><div class="wfc-ico">🕸</div><div class="wfc-name">VPC Module</div><div class="wfc-desc">Multi-AZ VPC with public/private subnets, NAT gateways, VPC endpoints, flow logs</div><div class="wfc-tags"><span class="wfc-tag wt-o">VPC</span><span class="wfc-tag wt-b">Networking</span></div></div>
+    <div class="wfc wfc-teal" onclick="ai('Write a complete Terraform EKS module: managed node groups with spot/on-demand mix, IRSA setup, cluster autoscaler, AWS Load Balancer Controller, EBS CSI driver, Calico network policy, OIDC provider, and aws-auth ConfigMap management. Include all variables and outputs.')"><div class="wfc-ico">☸</div><div class="wfc-name">EKS Cluster Module</div><div class="wfc-desc">Managed node groups, IRSA, cluster autoscaler, LB controller, CSI drivers</div><div class="wfc-tags"><span class="wfc-tag wt-t">EKS</span><span class="wfc-tag wt-b">Kubernetes</span></div></div>
+    <div class="wfc wfc-blue" onclick="ai('Create a Terraform Aurora Serverless v2 module: PostgreSQL, Multi-AZ writer/reader setup, parameter group, subnet group in private subnets, security group with configurable CIDR, Secrets Manager with rotation Lambda, Performance Insights, Enhanced Monitoring, backup retention. Complete module with variables.')"><div class="wfc-ico">🗄</div><div class="wfc-name">Aurora Serverless v2</div><div class="wfc-desc">PostgreSQL with Multi-AZ, secrets rotation, monitoring, backup configuration</div><div class="wfc-tags"><span class="wfc-tag wt-b">Aurora</span><span class="wfc-tag wt-o">Serverless</span></div></div>
+    <div class="wfc wfc-green" onclick="ai('Write a Terraform ECS Fargate service module: task definition with configurable containers/env vars, ALB target group, service auto scaling (CPU+memory), CloudWatch log group, IAM task role, execution role, security groups, and optional service discovery. Complete module.')"><div class="wfc-ico">🐳</div><div class="wfc-name">ECS Fargate Service</div><div class="wfc-desc">Fargate tasks with ALB, auto-scaling, log groups, IAM roles, service discovery</div><div class="wfc-tags"><span class="wfc-tag wt-g">ECS</span><span class="wfc-tag wt-o">Fargate</span></div></div>
+    <div class="wfc wfc-purple" onclick="ai('Create a Terraform static website module: S3 bucket with website hosting, CloudFront distribution with OAC, ACM certificate (us-east-1 provider), Route53 record, WAF WebACL with managed rules, S3 lifecycle for old versions, and CI/CD CodePipeline for deployments. Full module.')"><div class="wfc-ico">🌐</div><div class="wfc-name">Static Website + CDN</div><div class="wfc-desc">S3 + CloudFront + ACM + Route53 + WAF with CI/CD deployment pipeline</div><div class="wfc-tags"><span class="wfc-tag wt-p">CloudFront</span><span class="wfc-tag wt-o">S3</span></div></div>
+    <div class="wfc wfc-orange" onclick="ai('Write a Terraform multi-account landing zone module using AWS Organizations: OU structure, SCPs for guardrails, CloudTrail organization trail, Config organization rules, centralized logging account, security account with GuardDuty delegated admin, and account vending machine Lambda. Complete module.')"><div class="wfc-ico">🏢</div><div class="wfc-name">Landing Zone Module</div><div class="wfc-desc">Multi-account Organizations with SCPs, centralized logging, GuardDuty, account vending</div><div class="wfc-tags"><span class="wfc-tag wt-o">Organizations</span><span class="wfc-tag wt-b">Control Tower</span></div></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ FINOPS -->
+<div class="panel" id="panel-finops">
+<div class="scroll">
+  <div class="ph"><div class="ph-left"><div class="ph-title">FinOps Cost Dashboard</div><div class="ph-sub">AI-powered cost optimization — $2,840 in savings identified</div></div>
+  <div class="ph-actions"><button class="btn btn-ghost btn-sm" onclick="ai('I am spending $8,412/month on AWS. Do a comprehensive FinOps analysis: identify top 10 cost optimizations, ROI for each, implementation effort, and a 90-day savings roadmap to get my bill under $5,500.')">Full FinOps Audit ↗</button><button class="btn btn-primary btn-sm">Export Report</button></div></div>
+  <div class="stats-grid stats-4">
+    <div class="stat stat-r"><div class="stat-label">Current Spend</div><div class="stat-val s-r">$8,412</div><div class="stat-sub stat-dn">▲ 18% over budget</div></div>
+    <div class="stat stat-g"><div class="stat-label">Identified Savings</div><div class="stat-val s-g">$2,840</div><div class="stat-sub">34% reduction possible</div></div>
+    <div class="stat stat-o"><div class="stat-label">Optimized Target</div><div class="stat-val s-o">$5,572</div><div class="stat-sub">after all recommendations</div></div>
+    <div class="stat stat-b"><div class="stat-label">Waste</div><div class="stat-val s-b">$1,180</div><div class="stat-sub stat-dn">idle + orphaned resources</div></div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head"><div class="card-title">💸 Spend by Service</div></div>
+      <div class="card-body">
+        <div class="cbar"><div class="cbar-top"><span class="cbar-label">EC2 (On-Demand)</span><span class="cbar-val">$3,820</span></div><div class="cbar-track"><div class="cbar-fill" style="width:45%;background:var(--orange)"></div></div></div>
+        <div class="cbar"><div class="cbar-top"><span class="cbar-label">RDS / Aurora</span><span class="cbar-val">$1,640</span></div><div class="cbar-track"><div class="cbar-fill" style="width:19%;background:var(--blue)"></div></div></div>
+        <div class="cbar"><div class="cbar-top"><span class="cbar-label">EKS Cluster</span><span class="cbar-val">$1,200</span></div><div class="cbar-track"><div class="cbar-fill" style="width:14%;background:var(--teal)"></div></div></div>
+        <div class="cbar"><div class="cbar-top"><span class="cbar-label">Data Transfer</span><span class="cbar-val">$720</span></div><div class="cbar-track"><div class="cbar-fill" style="width:8%;background:var(--purple)"></div></div></div>
+        <div class="cbar"><div class="cbar-top"><span class="cbar-label">S3 + CloudFront</span><span class="cbar-val">$580</span></div><div class="cbar-track"><div class="cbar-fill" style="width:7%;background:var(--green)"></div></div></div>
+        <div class="cbar"><div class="cbar-top"><span class="cbar-label">Lambda + API GW</span><span class="cbar-val">$452</span></div><div class="cbar-track"><div class="cbar-fill" style="width:5%;background:var(--amber)"></div></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">🤖 AI Recommendations</div></div>
+        <div class="card-body" style="padding:.5rem .8rem;">
+          <div class="rec-card rc-g" onclick="ai('Generate a 1-year Compute Savings Plans recommendation for my EC2 fleet of 47 instances (mix of t3, m5, c5 families). Show the exact purchase configuration, breakeven point, estimated savings, and the AWS CLI command to purchase it.')"><div class="rec-ico">💡</div><div class="rec-body"><div class="rec-title">Purchase Compute Savings Plans</div><div class="rec-desc">1-year commitment for 32 predictable instances</div><div class="rec-save rs-g">Save $960/mo · Low effort</div></div><div class="rec-action"><button class="btn btn-ghost btn-sm">Generate ↗</button></div></div>
+          <div class="rec-card rc-o" onclick="ai('Identify and list all idle EC2 instances (under 5% CPU for 7+ days), unattached EBS volumes, old snapshots over 30 days, and unused Elastic IPs in my account. Generate boto3 cleanup script with dry-run mode and cost savings calculation.')"><div class="rec-ico">🗑</div><div class="rec-body"><div class="rec-title">Delete Orphaned Resources</div><div class="rec-desc">Idle EC2s, unattached EBS, old snapshots, unused EIPs</div><div class="rec-save rs-o">Save $620/mo · Immediate</div></div><div class="rec-action"><button class="btn btn-ghost btn-sm">Generate ↗</button></div></div>
+          <div class="rec-card rc-b" onclick="ai('Create S3 lifecycle policies for all my buckets: move objects to S3-IA after 30 days, Glacier Instant Retrieval after 90 days, Deep Archive after 365 days, delete incomplete multipart uploads after 7 days. Include the JSON policies and boto3 script to apply to all buckets.')"><div class="rec-ico">🪣</div><div class="rec-body"><div class="rec-title">S3 Intelligent-Tiering</div><div class="rec-desc">Lifecycle policies across 34 buckets</div><div class="rec-save rs-g">Save $380/mo · Low effort</div></div><div class="rec-action"><button class="btn btn-ghost btn-sm">Generate ↗</button></div></div>
+          <div class="rec-card rc-g" onclick="ai('Analyze my RDS instances for right-sizing opportunities: look at CPU, connections, and IOPS over 14 days. Recommend smaller instance classes where utilization is below 40%. Generate the AWS CLI commands to modify instances during next maintenance window.')"><div class="rec-ico">🗄</div><div class="rec-body"><div class="rec-title">RDS Right-Sizing</div><div class="rec-desc">3 instances under 40% utilization</div><div class="rec-save rs-g">Save $480/mo · Medium effort</div></div><div class="rec-action"><button class="btn btn-ghost btn-sm">Generate ↗</button></div></div>
+          <div class="rec-card rc-o" onclick="ai('Create a dev/staging instance scheduler that stops all non-production EC2 and RDS instances at 7pm and starts them at 8am on weekdays only. Use Lambda, EventBridge, and DynamoDB for schedule overrides. Include Slack command to extend runtime.')"><div class="rec-ico">⏰</div><div class="rec-body"><div class="rec-title">Dev Environment Scheduler</div><div class="rec-desc">Stop dev/staging instances nights and weekends</div><div class="rec-save rs-o">Save $400/mo · Medium effort</div></div><div class="rec-action"><button class="btn btn-ghost btn-sm">Generate ↗</button></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ SECURITY HUB -->
+<div class="panel" id="panel-security">
+<div class="scroll">
+  <div class="ph"><div class="ph-left"><div class="ph-title">Security Hub</div><div class="ph-sub">9 active findings · AWS Foundational Security Best Practices</div></div>
+  <div class="ph-actions"><button class="btn btn-danger btn-sm" onclick="ai('Perform a comprehensive AWS security audit. List all critical security findings, provide risk scores, and generate a prioritized remediation plan with specific CloudFormation, CLI commands, or code for each fix.')">🚨 Full Audit ↗</button></div></div>
+  <div class="stats-grid stats-4">
+    <div class="stat stat-r"><div class="stat-label">Critical</div><div class="stat-val s-r">3</div><div class="stat-sub">Fix immediately</div></div>
+    <div class="stat stat-o"><div class="stat-label">High</div><div class="stat-val s-o">4</div><div class="stat-sub">Fix this week</div></div>
+    <div class="stat stat-b"><div class="stat-label">Medium</div><div class="stat-val s-b">18</div><div class="stat-sub">Plan to fix</div></div>
+    <div class="stat stat-g"><div class="stat-label">Score</div><div class="stat-val s-g">76%</div><div class="stat-sub">▲ Up from 61%</div></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">🚨 Active Findings</div></div>
+    <div class="card-body"><table class="tbl">
+      <tr><th>Finding</th><th>Severity</th><th>Resource</th><th>OWASP/CIS</th><th>Fix with AI</th></tr>
+      <tr><td>S3 bucket publicly accessible + unencrypted</td><td><span class="badge bg-r">CRITICAL</span></td><td class="mono">dev-uploads-test</td><td class="mono" style="font-size:.63rem">CIS 2.1.2</td><td><button class="btn btn-ghost btn-sm" onclick="ai('Generate complete fix for public S3 bucket: 1) Block all public access with CLI, 2) Enable AES-256 default encryption, 3) Add bucket policy blocking HTTP, 4) Enable versioning, 5) Add lifecycle rules. Show all AWS CLI commands.')">Fix ↗</button></td></tr>
+      <tr><td>Root account has no MFA enabled</td><td><span class="badge bg-r">CRITICAL</span></td><td class="mono">root account</td><td class="mono" style="font-size:.63rem">CIS 1.5</td><td><button class="btn btn-ghost btn-sm" onclick="ai('Write an SCP that denies all API calls if MFA is not present on the session, with exceptions for emergency break-glass procedures. Include the JSON policy and instructions to attach via AWS Organizations.')">Fix ↗</button></td></tr>
+      <tr><td>Security group 0.0.0.0/0 on SSH port 22</td><td><span class="badge bg-r">CRITICAL</span></td><td class="mono">sg-0abc123def</td><td class="mono" style="font-size:.63rem">CIS 5.2</td><td><button class="btn btn-ghost btn-sm" onclick="ai('Remove SSH port 22 access and replace with AWS Systems Manager Session Manager. Generate: 1) CLI to remove the SG rule, 2) IAM instance profile for SSM, 3) SSM Session Manager config with CloudTrail logging, 4) VPC endpoint for SSM if in private subnet.')">Fix ↗</button></td></tr>
+      <tr><td>IAM user with AdministratorAccess directly attached</td><td><span class="badge bg-o">HIGH</span></td><td class="mono">iam-user-dev01</td><td class="mono" style="font-size:.63rem">CIS 1.16</td><td><button class="btn btn-ghost btn-sm" onclick="ai('Generate least-privilege IAM policy for developer: EC2 describe, S3 read/write to specific buckets, Lambda full, CloudWatch logs, no IAM/billing access. Include permission boundary to prevent privilege escalation. Show CLI commands to apply.')">Fix ↗</button></td></tr>
+      <tr><td>RDS instance not encrypted at rest</td><td><span class="badge bg-o">HIGH</span></td><td class="mono">prod-db-legacy</td><td class="mono" style="font-size:.63rem">CIS 2.3.1</td><td><button class="btn btn-ghost btn-sm" onclick="ai('Write step-by-step RDS encryption migration: snapshot → copy with KMS → restore → minimal downtime DNS cutover. Include all CLI commands, estimated downtime, and rollback procedure.')">Fix ↗</button></td></tr>
+      <tr><td>CloudTrail not enabled in all regions</td><td><span class="badge bg-o">HIGH</span></td><td class="mono">us-west-2, eu-west-1</td><td class="mono" style="font-size:.63rem">CIS 3.1</td><td><button class="btn btn-ghost btn-sm" onclick="ai('Enable CloudTrail in all regions using an organization trail: CloudFormation StackSet to deploy trail in all accounts and regions, S3 bucket with integrity validation, CloudWatch Logs integration, and SNS alerts for root activity and console logins without MFA.')">Fix ↗</button></td></tr>
+    </table></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ COMPLIANCE -->
+<div class="panel" id="panel-compliance">
+<div class="scroll">
+  <div class="ph"><div class="ph-left"><div class="ph-title">Compliance Center</div><div class="ph-sub">SOC2 · PCI-DSS · HIPAA · CIS · NIST · ISO 27001</div></div>
+  <button class="btn btn-primary btn-sm" onclick="ai('Generate a complete AWS compliance gap analysis for SOC2 Type II. List all controls, current status, evidence needed, and specific AWS services/configurations required. Include a 90-day remediation roadmap.')">Gap Analysis ↗</button></div>
+  <div class="compliance-grid">
+    <div class="comp-card" onclick="ai('What are the specific AWS configurations required for SOC2 Type II compliance? List all technical controls with the exact services, settings, and evidence needed for each trust service criteria: Security, Availability, Processing Integrity, Confidentiality, Privacy.')"><div class="comp-name">SOC2 Type II</div><div class="comp-score" style="color:var(--teal)">84%</div><div class="comp-bar-track"><div class="comp-bar-fill" style="width:84%;background:var(--teal)"></div></div><div class="comp-stats"><span class="comp-stat" style="color:var(--green)">42 pass</span><span class="comp-stat" style="color:var(--red)">8 fail</span></div></div>
+    <div class="comp-card" onclick="ai('What are the AWS infrastructure requirements for PCI-DSS compliance? List all 12 requirements with specific AWS services, configurations, and documentation needed. Focus on network segmentation, encryption, access control, and monitoring.')"><div class="comp-name">PCI-DSS v4.0</div><div class="comp-score" style="color:var(--orange)">71%</div><div class="comp-bar-track"><div class="comp-bar-fill" style="width:71%;background:var(--orange)"></div></div><div class="comp-stats"><span class="comp-stat" style="color:var(--green)">28 pass</span><span class="comp-stat" style="color:var(--red)">11 fail</span></div></div>
+    <div class="comp-card" onclick="ai('What AWS services and configurations are required for HIPAA compliance? List all safeguards: technical, physical, administrative. Which AWS services are covered under the BAA? What architecture changes are needed to handle PHI securely?')"><div class="comp-name">HIPAA</div><div class="comp-score" style="color:var(--blue)">78%</div><div class="comp-bar-track"><div class="comp-bar-fill" style="width:78%;background:var(--blue)"></div></div><div class="comp-stats"><span class="comp-stat" style="color:var(--green)">31 pass</span><span class="comp-stat" style="color:var(--red)">9 fail</span></div></div>
+    <div class="comp-card" onclick="ai('Generate a complete CIS AWS Foundations Benchmark v2.0 assessment: list all 60+ controls with pass/fail status for my account, and provide remediation steps for each failing control with AWS CLI commands or CloudFormation.')"><div class="comp-name">CIS AWS v2.0</div><div class="comp-score" style="color:var(--green)">91%</div><div class="comp-bar-track"><div class="comp-bar-fill" style="width:91%;background:var(--green)"></div></div><div class="comp-stats"><span class="comp-stat" style="color:var(--green)">55 pass</span><span class="comp-stat" style="color:var(--red)">5 fail</span></div></div>
+    <div class="comp-card" onclick="ai('Map my AWS architecture to NIST CSF 2.0 functions: Govern, Identify, Protect, Detect, Respond, Recover. For each function, list current AWS services fulfilling the role, gaps, and recommended additions with implementation guidance.')"><div class="comp-name">NIST CSF 2.0</div><div class="comp-score" style="color:var(--purple)">68%</div><div class="comp-bar-track"><div class="comp-bar-fill" style="width:68%;background:var(--purple)"></div></div><div class="comp-stats"><span class="comp-stat" style="color:var(--green)">34 pass</span><span class="comp-stat" style="color:var(--red)">16 fail</span></div></div>
+    <div class="comp-card" onclick="ai('What AWS controls map to ISO 27001:2022 Annex A? List all 93 controls with AWS service mappings, required configurations, and evidence to collect for certification. Highlight the 15 most critical controls to implement first.')"><div class="comp-name">ISO 27001:2022</div><div class="comp-score" style="color:var(--amber)">73%</div><div class="comp-bar-track"><div class="comp-bar-fill" style="width:73%;background:var(--amber)"></div></div><div class="comp-stats"><span class="comp-stat" style="color:var(--green)">68 pass</span><span class="comp-stat" style="color:var(--red)">25 fail</span></div></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ MONITORING HUB -->
+<div class="panel" id="panel-monitoring">
+<div class="scroll">
+  <div class="ph"><div class="ph-left"><div class="ph-title">Monitoring Hub</div><div class="ph-sub">CloudWatch · Grafana · Datadog · OpenTelemetry</div></div>
+  <button class="btn btn-primary btn-sm" onclick="ai('Create a comprehensive CloudWatch monitoring setup: composite alarms for all critical services, anomaly detection for key metrics, custom dashboards with Container Insights, synthetics canary for all public endpoints, and PagerDuty SNS integration. Include CloudFormation.')">Build Full Stack ↗</button></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head"><div class="card-title">📊 Key Metrics</div></div>
+      <div class="card-body">
+        <div class="insight-row" style="grid-template-columns:repeat(2,1fr);gap:.5rem;margin:0;">
+          <div class="insight-c" style="cursor:pointer" onclick="ai('Set up CloudWatch alarms and dashboards for EC2 fleet monitoring: CPU, memory (with CloudWatch agent), disk I/O, network throughput, status checks, and auto-scaling triggers. Include the JSON dashboard definition and CloudFormation for all alarms.')"><div class="ic-title">🖥 EC2 Fleet</div><div class="ic-val" style="color:var(--orange)">CPU: 67%</div><div class="ic-sub">Peak: 91% · Avg: 43%</div></div>
+          <div class="insight-c" style="cursor:pointer" onclick="ai('Create RDS monitoring with CloudWatch: DatabaseConnections, FreeStorageSpace, ReadLatency, WriteLatency, IOPS, ReplicaLag alarms. Enhanced monitoring with 1-second granularity. Performance Insights query analysis. CloudFormation template included.')"><div class="ic-title">🗄 RDS</div><div class="ic-val" style="color:var(--blue)">Conns: 284</div><div class="ic-sub">Latency: 4ms · IOPS: 2400</div></div>
+          <div class="insight-c" style="cursor:pointer" onclick="ai('Monitor Lambda functions with CloudWatch: error rates, duration percentiles, concurrent executions, throttles, dead letter queue depth. Create anomaly detection alarms and a unified Lambda health dashboard. Include CloudFormation.')"><div class="ic-title">⚡ Lambda</div><div class="ic-val" style="color:var(--red)">Errors: 8.7%</div><div class="ic-sub">Duration: 340ms · Throttles: 12</div></div>
+          <div class="insight-c" style="cursor:pointer" onclick="ai('Set up Application Load Balancer monitoring: HTTPCode_Target_5XX_Count, TargetResponseTime, HealthyHostCount, RequestCount, and RejectedConnectionCount alarms. Create CloudWatch dashboard with request rate graphs. Include CloudFormation.')"><div class="ic-title">⚖ ALB</div><div class="ic-val" style="color:var(--green)">5xx: 0.02%</div><div class="ic-sub">RPS: 4,200 · P99: 180ms</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">🔔 Alarm Status</div><button class="btn btn-ghost btn-sm" onclick="ai('Generate a complete CloudWatch composite alarm setup: individual alarms for each service, combined into a composite alarm that triggers only on multi-service degradation. Include SNS → PagerDuty integration and on-call rotation.')">Configure ↗</button></div>
+      <div class="card-body" style="padding:.5rem .8rem;">
+        <div class="alert-feed">
+          <div class="alert-item alert-crit" onclick="ai('Lambda data-pipeline has 8.7% error rate. Write CloudWatch Logs Insights queries to find the errors, identify the root cause pattern, and suggest fixes. Also set up dead-letter queue and alarm for future incidents.')"><div class="ai-icon">🔴</div><div><div class="ai-title">Lambda Error Rate ALARM</div><div class="ai-desc">data-pipeline: 8.7% errors (threshold: 1%)</div></div><div class="ai-time">3m</div></div>
+          <div class="alert-item alert-warn" onclick="ai('EC2 prod-api-001 CPU is at 91%. Diagnose: check top processes with SSM Run Command, analyze CloudWatch metrics for pattern, recommend: scale up, scale out, optimize, or investigate application issue.')"><div class="ai-icon">🟠</div><div><div class="ai-title">EC2 High CPU WARNING</div><div class="ai-desc">prod-api-001: 91% (threshold: 80%)</div></div><div class="ai-time">20m</div></div>
+          <div class="alert-item alert-ok"><div class="ai-icon">🟢</div><div><div class="ai-title">RDS Connections OK</div><div class="ai-desc">prod-db-cluster: 284/1000 connections</div></div><div class="ai-time">1m</div></div>
+          <div class="alert-item alert-ok"><div class="ai-icon">🟢</div><div><div class="ai-title">ALB Health OK</div><div class="ai-desc">prod-alb: 0.02% 5xx · P99 180ms</div></div><div class="ai-time">1m</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ EKS -->
+<div class="panel" id="panel-eks">
+<div class="scroll">
+  <div class="ph"><div class="ph-left"><div class="ph-title">EKS / Kubernetes Manager</div><div class="ph-sub">2 clusters · 24 nodes · 87 pods running</div></div>
+  <div class="ph-actions"><button class="btn btn-ghost btn-sm" onclick="ai('Create a complete production EKS cluster setup with Terraform: managed node groups with spot/on-demand mix, Karpenter for auto-scaling, AWS Load Balancer Controller, ExternalDNS, Cluster Autoscaler, EBS/EFS CSI drivers, IRSA for all add-ons, and a complete Helm values file.')">New Cluster ↗</button></div></div>
+  <div class="k8s-cluster">
+    <div class="k8s-title"><span>🟢 prod-eks-cluster · us-east-1 · v1.29</span><div style="display:flex;gap:.5rem;"><button class="btn btn-ghost btn-sm" onclick="ai('Upgrade my EKS cluster from 1.29 to 1.30. Write a complete runbook: pre-upgrade checks, managed node group upgrade procedure, add-on compatibility checks, application testing, and rollback procedure. Include all kubectl and eksctl commands.')">Upgrade ↗</button><button class="btn btn-ghost btn-sm" onclick="ai('Analyze my EKS cluster for security issues: privileged pods, hostNetwork usage, missing pod security standards, RBAC over-permissions, exposed services, missing network policies. Generate a hardening checklist with kubectl commands to fix each issue.')">Security Scan ↗</button></div></div>
+    <div class="k8s-nodes">
+      <div class="k8s-node"><div class="kn-name">node-001 (m5.xl)</div><div class="kn-status"><span class="sdot sd-g"></span>Ready</div><div style="font-size:.62rem;color:var(--text2);margin-bottom:.3rem;">CPU 74% · Mem 68%</div><div class="kn-bar"><div class="kn-fill" style="width:74%;background:var(--orange)"></div></div></div>
+      <div class="k8s-node"><div class="kn-name">node-002 (m5.xl)</div><div class="kn-status"><span class="sdot sd-g"></span>Ready</div><div style="font-size:.62rem;color:var(--text2);margin-bottom:.3rem;">CPU 52% · Mem 71%</div><div class="kn-bar"><div class="kn-fill" style="width:52%;background:var(--teal)"></div></div></div>
+      <div class="k8s-node"><div class="kn-name">node-003 (spot)</div><div class="kn-status"><span class="sdot sd-g"></span>Ready</div><div style="font-size:.62rem;color:var(--text2);margin-bottom:.3rem;">CPU 31% · Mem 44%</div><div class="kn-bar"><div class="kn-fill" style="width:31%;background:var(--green)"></div></div></div>
+      <div class="k8s-node"><div class="kn-name">node-004 (spot)</div><div class="kn-status"><span class="sdot sd-o"></span>Draining</div><div style="font-size:.62rem;color:var(--amber);margin-bottom:.3rem;">Spot interruption</div><div class="kn-bar"><div class="kn-fill" style="width:88%;background:var(--red)"></div></div></div>
+    </div>
+  </div>
+  <div class="wf-grid">
+    <div class="wfc wfc-teal" onclick="ai('Set up Karpenter on EKS as replacement for Cluster Autoscaler: NodePool and NodeClass definitions for on-demand and spot with mixed instance types, disruption budgets, scheduled scale-downs for dev workloads, and consolidation policies. Include full Terraform and Helm configuration.')"><div class="wfc-ico">☸</div><div class="wfc-name">Karpenter Auto-Scaler</div><div class="wfc-desc">Replace Cluster Autoscaler with Karpenter for intelligent spot/on-demand provisioning</div><div class="wfc-tags"><span class="wfc-tag wt-t">Karpenter</span><span class="wfc-tag wt-g">Spot</span></div></div>
+    <div class="wfc wfc-blue" onclick="ai('Set up Istio service mesh on EKS: mTLS between all services, traffic management with VirtualService and DestinationRule, canary deployments, circuit breakers, retry policies, JWT authentication, and Kiali + Jaeger observability stack. Include Terraform and Helm values.')"><div class="wfc-ico">🕸</div><div class="wfc-name">Istio Service Mesh</div><div class="wfc-desc">mTLS, traffic management, canary deployments, circuit breakers, observability</div><div class="wfc-tags"><span class="wfc-tag wt-b">Istio</span><span class="wfc-tag wt-p">mTLS</span></div></div>
+    <div class="wfc wfc-orange" onclick="ai('Implement pod security hardening for EKS: Pod Security Standards (restricted profile), OPA Gatekeeper policies, Falco runtime security with alerting, image admission webhook to block non-ECR images, network policies to enforce zero-trust between namespaces. Include all YAML manifests.')"><div class="wfc-ico">🔒</div><div class="wfc-name">Pod Security Hardening</div><div class="wfc-desc">Pod Security Standards, OPA Gatekeeper, Falco runtime security, image admission</div><div class="wfc-tags"><span class="wfc-tag wt-r">Security</span><span class="wfc-tag wt-o">OPA</span></div></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ DISASTER RECOVERY -->
+<div class="panel" id="panel-dr">
+<div class="scroll">
+  <div class="ph"><div class="ph-left"><div class="ph-title">Disaster Recovery Planner</div><div class="ph-sub">RTO: 15min · RPO: 5min · Multi-region active-passive</div></div>
+  <button class="btn btn-primary btn-sm" onclick="ai('Design a complete disaster recovery strategy for my AWS infrastructure: multi-region active-passive setup, RTO under 15 minutes, RPO under 5 minutes. Include RDS cross-region replica promotion, S3 replication, EC2 AMI copying, Route53 health check failover, and a full DR runbook with scripts.')">Design DR Plan ↗</button></div>
+  <div class="stats-grid stats-4">
+    <div class="stat stat-g"><div class="stat-label">Current RTO</div><div class="stat-val s-g">12min</div><div class="stat-sub">Target: 15min ✓</div></div>
+    <div class="stat stat-g"><div class="stat-label">Current RPO</div><div class="stat-val s-g">4min</div><div class="stat-sub">Target: 5min ✓</div></div>
+    <div class="stat stat-b"><div class="stat-label">Last DR Test</div><div class="stat-val s-b">14d</div><div class="stat-sub">Passed all checks</div></div>
+    <div class="stat stat-o"><div class="stat-label">DR Region</div><div class="stat-val s-o">us-west-2</div><div class="stat-sub">Warm standby</div></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">📖 DR Runbook — Failover Procedure</div><button class="btn btn-ghost btn-sm" onclick="ai('Create an automated DR failover Lambda function that: 1) Promotes RDS read replica in us-west-2, 2) Updates Route53 health checks, 3) Scales up standby ECS services, 4) Notifies team via SNS, 5) Creates DR incident ticket. Include the complete Lambda code and EventBridge trigger.')">Automate ↗</button></div>
+    <div class="card-body" style="padding:.5rem .8rem;">
+      <div class="rb-step"><div class="rb-num">1</div><div class="rb-content"><div class="rb-title">Detect failure & trigger</div><div class="rb-desc">Route53 health checks detect primary region failure. EventBridge triggers DR Lambda. Estimated time: 30 seconds.</div></div></div>
+      <div class="rb-step"><div class="rb-num">2</div><div class="rb-content"><div class="rb-title">Promote RDS read replica</div><div class="rb-desc">Run: <code>aws rds promote-read-replica --db-instance-identifier prod-replica-west2</code>. Wait for Available status. Estimated time: 5-8 minutes.</div></div></div>
+      <div class="rb-step"><div class="rb-num">3</div><div class="rb-content"><div class="rb-title">Update DNS failover</div><div class="rb-desc">Route53 health-check-based failover activates us-west-2 ALB record. DNS TTL: 60s. Traffic shifts in 1-2 minutes.</div></div></div>
+      <div class="rb-step"><div class="rb-num">4</div><div class="rb-content"><div class="rb-title">Scale up standby services</div><div class="rb-desc">ECS services in us-west-2 scale from 1 to production capacity. Lambda: <code>update-service --desired-count 10</code>. Estimated: 3-4 minutes.</div></div></div>
+      <div class="rb-step"><div class="rb-num">5</div><div class="rb-content"><div class="rb-title">Validate & notify</div><div class="rb-desc">Run synthetic tests against us-west-2 endpoints. SNS notification to on-call team. Update status page. Create incident in PagerDuty.</div></div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ ALERTS -->
+<div class="panel" id="panel-alerts">
+<div class="scroll">
+  <div class="ph"><div class="ph-left"><div class="ph-title">Alerts & Events</div><div class="ph-sub">9 active · 3 critical · Last updated 30s ago</div></div>
+  <button class="btn btn-ghost btn-sm" onclick="ai('Set up a comprehensive alerting system: CloudWatch alarms for all critical metrics, EventBridge rules for AWS Health events, Cost Anomaly Detection, GuardDuty findings, and a unified SNS fan-out to Slack, PagerDuty, and email. Include CloudFormation.')">Configure Alerts ↗</button></div>
+  <div class="alert-feed">
+    <div class="alert-item alert-crit" onclick="ai('My Lambda function data-pipeline has an 8.7% error rate. Help me: 1) Write CloudWatch Logs Insights queries to find errors, 2) Identify the most likely root causes, 3) Suggest fixes, 4) Set up proper alerting with dead-letter queue.')"><div class="ai-icon">🔴</div><div><div class="ai-title">CRITICAL: Lambda error spike — data-pipeline</div><div class="ai-desc">Error rate 8.7% · Threshold: 1% · Affected: ~1,200 invocations · Started 3 min ago</div></div><div class="ai-time">3m</div></div>
+    <div class="alert-item alert-crit" onclick="ai('S3 bucket dev-uploads-test is publicly accessible and unencrypted. Generate immediate fix commands and explain how this could have been prevented with SCPs and AWS Config rules.')"><div class="ai-icon">🔴</div><div><div class="ai-title">CRITICAL: Public S3 bucket detected</div><div class="ai-desc">dev-uploads-test · No encryption · 23GB potentially exposed · Detected by GuardDuty</div></div><div class="ai-time">11m</div></div>
+    <div class="alert-item alert-crit" onclick="ai('My AWS monthly spend is $8,412 which is 18% over the $7,100 budget. Identify the top cost drivers vs last month, which teams/services are responsible, and give me immediate actions to bring costs down.')"><div class="ai-icon">🔴</div><div><div class="ai-title">CRITICAL: Budget exceeded 18%</div><div class="ai-desc">Monthly spend $8,412 vs $7,100 budget · EC2 +$840 · RDS +$320 vs last month</div></div><div class="ai-time">1h</div></div>
+    <div class="alert-item alert-warn" onclick="ai('EC2 instance prod-api-001 (c5.2xlarge) CPU has been at 91% for 20 minutes. What should I do? Analyze if I should: scale up the instance type, add more instances behind the ALB, or if this is an application-level issue.')"><div class="ai-icon">🟠</div><div><div class="ai-title">HIGH: EC2 CPU sustained high — prod-api-001</div><div class="ai-desc">CPU 91% for 20+ min · c5.2xlarge · Auto-scaling cooldown active · 3 requests queued</div></div><div class="ai-time">20m</div></div>
+    <div class="alert-item alert-warn" onclick="ai('EKS spot node node-004 is being interrupted. What is the impact? How do I ensure this is handled gracefully? Write a Karpenter node disruption budget and pod disruption budget to prevent future single points of failure.')"><div class="ai-icon">🟠</div><div><div class="ai-title">HIGH: EKS spot node interruption — node-004</div><div class="ai-desc">2-minute warning · Draining 12 pods · Karpenter provisioning replacement</div></div><div class="ai-time">2m</div></div>
+    <div class="alert-item alert-warn" onclick="ai('IAM user dev01 has AdministratorAccess attached directly. This violates least privilege. Generate the exact CLI commands to: detach AdminAccess, create a developer role with appropriate permissions, and set up permission boundaries.')"><div class="ai-icon">🟠</div><div><div class="ai-title">HIGH: IAM policy violation — dev01</div><div class="ai-desc">AdministratorAccess attached directly to user · Policy: no direct admin attachment</div></div><div class="ai-time">2h</div></div>
+    <div class="alert-item alert-info"><div class="ai-icon">🔵</div><div><div class="ai-title">INFO: RDS maintenance window tonight</div><div class="ai-desc">prod-db-cluster · Minor version upgrade · Window: 02:00-03:00 UTC · Expected downtime: 20-30s failover</div></div><div class="ai-time">4h</div></div>
+    <div class="alert-item alert-ok"><div class="ai-icon">🟢</div><div><div class="ai-title">RESOLVED: CodePipeline prod-api succeeded</div><div class="ai-desc">Deploy to ECS Fargate completed · Duration: 8m 32s · All health checks passed</div></div><div class="ai-time">2m</div></div>
+    <div class="alert-item alert-ok"><div class="ai-icon">🟢</div><div><div class="ai-title">RESOLVED: SSL certificate renewed</div><div class="ai-desc">ACM auto-renewed *.yourdomain.com · Valid until Apr 15 2027</div></div><div class="ai-time">6h</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ AUDIT LOG -->
+<div class="panel" id="panel-audit">
+<div class="scroll">
+  <div class="ph"><div class="ph-left"><div class="ph-title">Audit Log</div><div class="ph-sub">CloudTrail · All API calls · 90-day retention</div></div>
+  <button class="btn btn-ghost btn-sm" onclick="ai('Write CloudWatch Logs Insights queries to analyze CloudTrail: 1) All root account activity, 2) IAM policy changes, 3) Security group modifications, 4) S3 bucket policy changes, 5) Failed console login attempts. Include queries to detect potential security incidents.')">Query Logs ↗</button></div>
+  <div class="search-bar"><span class="si">🔍</span><input placeholder="Search events by user, resource, action, IP address..."/></div>
+  <div class="card">
+    <div class="card-body card-body-np">
+      <div style="padding:.5rem .8rem;font-family:'DM Mono',monospace;font-size:.68rem;line-height:1.8;">
+        <div class="log-line"><span class="log-ts">2026-04-15 03:21:07 UTC</span> <span class="log-warn">[IAM]</span> devops-admin attached AdministratorAccess to user dev01 · IP: 24.52.x.x</div>
+        <div class="log-line"><span class="log-ts">2026-04-15 03:18:42 UTC</span> <span class="log-ok">[EC2]</span> devops-admin launched i-0new1234abcd (c5.xlarge) prod-api-002 · us-east-1b</div>
+        <div class="log-line"><span class="log-ts">2026-04-15 03:12:01 UTC</span> <span class="log-err">[S3]</span> devops-admin set public ACL on s3://dev-uploads-test · SECURITY ALERT ⚠</div>
+        <div class="log-line"><span class="log-ts">2026-04-15 03:09:55 UTC</span> <span class="log-info">[CodePipeline]</span> pipeline prod-api execution SUCCEEDED · build: cbuild-abc · deploy: blue-green</div>
+        <div class="log-line"><span class="log-ts">2026-04-15 02:55:12 UTC</span> <span class="log-ok">[RDS]</span> devops-admin created snapshot prod-db-cluster-2026-04-15-manual</div>
+        <div class="log-line"><span class="log-ts">2026-04-15 02:48:33 UTC</span> <span class="log-warn">[IAM]</span> dev01 attempted DeleteBucketPolicy on prod-assets-v2 · AccessDenied</div>
+        <div class="log-line"><span class="log-ts">2026-04-15 02:31:07 UTC</span> <span class="log-info">[Lambda]</span> devops-admin updated function data-pipeline · runtime: python3.12 → python3.13</div>
+        <div class="log-line"><span class="log-ts">2026-04-15 02:14:52 UTC</span> <span class="log-ok">[CloudFormation]</span> devops-admin updated stack prod-vpc-stack · 3 resources modified</div>
+        <div class="log-line"><span class="log-ts">2026-04-15 01:58:19 UTC</span> <span class="log-err">[ROOT]</span> root account ConsoleLogin from IP 18.220.x.x · NO MFA · CRITICAL ⚠</div>
+        <div class="log-line"><span class="log-ts">2026-04-15 01:42:05 UTC</span> <span class="log-info">[EC2]</span> devops-admin modified security group sg-0abc123def · added 0.0.0.0/0:22 · ALERT ⚠</div>
+        <div class="log-line"><span class="log-ts">2026-04-15 01:30:00 UTC</span> <span class="log-ok">[Cost Explorer]</span> Budget alert sent: monthly spend $8,412 exceeds threshold $7,100</div>
+        <div class="log-line"><span class="log-ts">2026-04-15 00:01:00 UTC</span> <span class="log-ok">[EventBridge]</span> Scheduled rule fired: instance-scheduler-stop · stopped 8 dev/staging instances</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ REMAINING STUBS FOR OTHER PANELS -->
+<div class="panel" id="panel-ec2"><div class="scroll"><div class="ph"><div class="ph-left"><div class="ph-title">EC2 Manager</div><div class="ph-sub">47 instances · us-east-1 Production</div></div><button class="btn btn-primary btn-sm" onclick="ai('Give me a full EC2 fleet analysis: list all instances with CPU/memory utilization, right-sizing recommendations, instances that should be stopped, Reserved Instance opportunities, and potential savings. Include boto3 commands to implement changes.')">AI Fleet Analysis ↗</button></div>
+<div class="wf-grid"><div class="wfc wfc-orange" onclick="ai('Write a complete Auto Scaling Group setup with CloudFormation: launch template with latest Amazon Linux 2023, mixed instances policy (on-demand base + spot), target tracking scaling policy for CPU, scale-in protection, lifecycle hooks for graceful shutdown, and CloudWatch alarms.')"><div class="wfc-ico">📈</div><div class="wfc-name">Auto Scaling Group</div><div class="wfc-desc">Mixed instances, target tracking, lifecycle hooks, graceful shutdown</div><div class="wfc-tags"><span class="wfc-tag wt-o">ASG</span><span class="wfc-tag wt-g">Spot</span></div></div>
+<div class="wfc wfc-teal" onclick="ai('Set up EC2 Image Builder pipeline: component definition to install dependencies and harden the OS (CIS Level 1), automated AMI build on schedule, cross-region copy, vulnerability scanning, distribution to all production accounts. Include CloudFormation.')"><div class="wfc-ico">🏗</div><div class="wfc-name">EC2 Image Builder</div><div class="wfc-desc">Automated hardened AMI pipeline with CIS benchmarks and cross-region distribution</div><div class="wfc-tags"><span class="wfc-tag wt-t">AMI</span><span class="wfc-tag wt-b">CIS</span></div></div>
+<div class="wfc wfc-blue" onclick="ai('Configure AWS Systems Manager Fleet Manager for all EC2 instances: SSM agent deployment via State Manager, Patch Manager with patch baseline for Amazon Linux and Windows, Run Command for fleet operations, Session Manager to replace SSH, and Inventory for software tracking.')"><div class="wfc-ico">🖥</div><div class="wfc-name">Fleet Manager + SSM</div><div class="wfc-desc">Patch management, Session Manager, Run Command, Inventory — no SSH needed</div><div class="wfc-tags"><span class="wfc-tag wt-b">SSM</span><span class="wfc-tag wt-o">Patching</span></div></div>
+</div></div></div>
+
+<div class="panel" id="panel-lambda"><div class="scroll"><div class="ph"><div class="ph-left"><div class="ph-title">Lambda Studio</div><div class="ph-sub">24 functions · 2.4M invocations today</div></div><button class="btn btn-primary btn-sm" onclick="ai('Analyze my Lambda functions and provide: right-sizing recommendations for memory, timeout optimizations, cold start reduction strategies (provisioned concurrency ROI), functions that should be migrated to ECS, and cost breakdown per function.')">Analyze Functions ↗</button></div>
+<div class="wf-grid"><div class="wfc wfc-orange" onclick="ai('Write a production Lambda function architecture: function code with structured logging (aws-lambda-powertools), X-Ray tracing, custom metrics, dead-letter queue with SQS, Lambda Insights monitoring, environment variable encryption with KMS, and SAM template for deployment.')"><div class="wfc-ico">⚡</div><div class="wfc-name">Production Lambda Pattern</div><div class="wfc-desc">Powertools logging, X-Ray, custom metrics, DLQ, KMS encryption, SAM deployment</div><div class="wfc-tags"><span class="wfc-tag wt-o">Lambda</span><span class="wfc-tag wt-b">SAM</span></div></div>
+<div class="wfc wfc-teal" onclick="ai('Design a Step Functions workflow for an order processing system: validate order → charge payment → reserve inventory → notify fulfillment → send confirmation. Include error handling with retry/catch, parallel execution, callback pattern for async operations, and CloudFormation.')"><div class="wfc-ico">⇝</div><div class="wfc-name">Step Functions Workflow</div><div class="wfc-desc">Order processing orchestration with parallel execution, retries, and error handling</div><div class="wfc-tags"><span class="wfc-tag wt-t">Step Functions</span><span class="wfc-tag wt-o">SQS</span></div></div>
+<div class="wfc wfc-blue" onclick="ai('Build an event-driven architecture: S3 upload triggers Lambda via EventBridge, Lambda fans out to SNS, SNS delivers to SQS queues for different consumers (email, SMS, webhook), dead-letter queues for failures, and CloudWatch dashboards for the entire pipeline. Include CDK code.')"><div class="wfc-ico">📡</div><div class="wfc-name">Event-Driven Architecture</div><div class="wfc-desc">S3 → EventBridge → Lambda → SNS → SQS fan-out with DLQ and monitoring</div><div class="wfc-tags"><span class="wfc-tag wt-b">EventBridge</span><span class="wfc-tag wt-p">SNS/SQS</span></div></div>
+</div></div></div>
+
+<div class="panel" id="panel-s3"><div class="scroll"><div class="ph"><div class="ph-left"><div class="ph-title">S3 Manager</div><div class="ph-sub">34 buckets · 2.8TB total · 2 require immediate attention</div></div><button class="btn btn-primary btn-sm" onclick="ai('Audit all 34 S3 buckets: find public buckets, missing encryption, buckets without lifecycle policies, no versioning, no access logging, no replication. Generate a boto3 script to enforce baseline security settings across all buckets.')">Security Audit ↗</button></div>
+<div class="wf-grid"><div class="wfc wfc-orange" onclick="ai('Create comprehensive S3 security baseline CloudFormation: bucket with versioning, AES-256 encryption, public access blocked, access logging to central log bucket, object lock for compliance, intelligent tiering lifecycle, CORS policy for web app, and bucket policy blocking HTTP.')"><div class="wfc-ico">🔒</div><div class="wfc-name">Secure Bucket Baseline</div><div class="wfc-desc">Encryption, versioning, access logging, object lock, lifecycle, CORS</div><div class="wfc-tags"><span class="wfc-tag wt-o">S3</span><span class="wfc-tag wt-g">Security</span></div></div>
+<div class="wfc wfc-teal" onclick="ai('Set up S3 cross-region replication: same-account and cross-account replication configs, replication rules with prefix/tag filters, RTC (replication time control) for 15-minute SLA, replication metrics, batch replication for existing objects, and cost estimation.')"><div class="wfc-ico">↔</div><div class="wfc-name">Cross-Region Replication</div><div class="wfc-desc">Active replication with RTC, batch replication for existing objects, cost tracking</div><div class="wfc-tags"><span class="wfc-tag wt-t">CRR</span><span class="wfc-tag wt-b">DR</span></div></div>
+<div class="wfc wfc-green" onclick="ai('Design S3 Data Lake with access control: S3 bucket structure with partitioned prefixes (year/month/day), Lake Formation fine-grained permissions per team, S3 Access Points per application, Macie for PII detection, S3 Storage Lens for cost analytics, and Athena workgroups. Include Terraform.')"><div class="wfc-ico">🏔</div><div class="wfc-name">Data Lake Architecture</div><div class="wfc-desc">Lake Formation permissions, S3 Access Points, Macie PII detection, Athena workgroups</div><div class="wfc-tags"><span class="wfc-tag wt-g">Lake Formation</span><span class="wfc-tag wt-o">Macie</span></div></div>
+</div></div></div>
+
+<div class="panel" id="panel-databases"><div class="scroll"><div class="ph"><div class="ph-left"><div class="ph-title">Database Studio</div><div class="ph-sub">8 RDS instances · 2 DynamoDB tables · 1 ElastiCache cluster</div></div><button class="btn btn-primary btn-sm" onclick="ai('Analyze my database fleet: RDS right-sizing opportunities, Aurora Serverless migration candidates, DynamoDB capacity mode recommendations, ElastiCache instance sizing, and total monthly savings possible. Include implementation steps.')">Database Audit ↗</button></div>
+<div class="wf-grid"><div class="wfc wfc-blue" onclick="ai('Migrate a monolith PostgreSQL RDS to Aurora Serverless v2: assessment, DMS migration plan, cutover procedure with minimal downtime, connection string updates via Secrets Manager rotation, performance comparison, and estimated cost savings. Include all CloudFormation and CLI commands.')"><div class="wfc-ico">⬡</div><div class="wfc-name">RDS to Aurora Migration</div><div class="wfc-desc">DMS migration plan, cutover procedure, zero-downtime strategy, cost comparison</div><div class="wfc-tags"><span class="wfc-tag wt-b">Aurora</span><span class="wfc-tag wt-o">DMS</span></div></div>
+<div class="wfc wfc-purple" onclick="ai('Design a DynamoDB data model for a multi-tenant SaaS application: single-table design, partition key strategies, GSI design, on-demand vs provisioned capacity analysis, DynamoDB Streams for change data capture, DAX for read-heavy workloads. Include capacity calculations and CDK code.')"><div class="wfc-ico">⚡</div><div class="wfc-name">DynamoDB Data Modeling</div><div class="wfc-desc">Single-table design, GSIs, Streams, DAX, capacity planning, CDK infrastructure</div><div class="wfc-tags"><span class="wfc-tag wt-p">DynamoDB</span><span class="wfc-tag wt-t">DAX</span></div></div>
+<div class="wfc wfc-orange" onclick="ai('Set up Redis ElastiCache for a web application: cluster mode, multi-AZ with auto-failover, encryption in transit and at rest, auth tokens via Secrets Manager, VPC security groups, Parameter Group tuning for web caching, eviction policy, and CloudWatch alarms for cache hit ratio.')"><div class="wfc-ico">⚡</div><div class="wfc-name">ElastiCache Redis Cluster</div><div class="wfc-desc">Cluster mode, multi-AZ, encryption, auth tokens, tuned parameters, alarms</div><div class="wfc-tags"><span class="wfc-tag wt-o">Redis</span><span class="wfc-tag wt-g">HA</span></div></div>
+</div></div></div>
+
+<div class="panel" id="panel-iam"><div class="scroll"><div class="ph"><div class="ph-left"><div class="ph-title">IAM Studio</div><div class="ph-sub">AI-powered least-privilege policy generator</div></div><button class="btn btn-primary btn-sm" onclick="ai('Generate a complete IAM role structure for a medium-sized SaaS company: developer role, senior developer role, DevOps engineer role, data scientist role, read-only auditor role, billing admin role. Each with specific permissions and permission boundaries.')">Generate Role Set ↗</button></div>
+<div class="wf-grid"><div class="wfc wfc-orange" onclick="ai('Write a least-privilege IAM policy analysis and refactoring: take a common overly permissive policy (s3:* on all resources, ec2:*) and transform it into a precise least-privilege version with specific actions, resources, and conditions. Explain each decision.')"><div class="wfc-ico">🔑</div><div class="wfc-name">Least Privilege Refactor</div><div class="wfc-desc">Transform wildcard policies into precise, auditable least-privilege statements</div><div class="wfc-tags"><span class="wfc-tag wt-o">IAM</span><span class="wfc-tag wt-r">Security</span></div></div>
+<div class="wfc wfc-teal" onclick="ai('Set up IRSA (IAM Roles for Service Accounts) for EKS: OIDC provider setup, service account annotation, role trust policy, and examples for S3, DynamoDB, SQS access from pods. Include Terraform module and Helm chart annotation pattern.')"><div class="wfc-ico">☸</div><div class="wfc-name">IRSA for EKS</div><div class="wfc-desc">Pod-level IAM roles via OIDC — no node instance profile required</div><div class="wfc-tags"><span class="wfc-tag wt-t">IRSA</span><span class="wfc-tag wt-b">EKS</span></div></div>
+<div class="wfc wfc-blue" onclick="ai('Create an IAM Access Analyzer workflow: enable in all regions and organization, set up archive rules for known safe policies, EventBridge → Lambda → Jira ticket creation for new findings, weekly unused access report, and automated policy cleanup for 90+ day unused permissions.')"><div class="wfc-ico">🔍</div><div class="wfc-name">Access Analyzer Automation</div><div class="wfc-desc">Automated finding → Jira ticket, weekly unused access reports, policy cleanup</div><div class="wfc-tags"><span class="wfc-tag wt-b">Analyzer</span><span class="wfc-tag wt-o">Automation</span></div></div>
+</div></div></div>
+
+<div class="panel" id="panel-vpc"><div class="scroll"><div class="ph"><div class="ph-left"><div class="ph-title">VPC Designer</div><div class="ph-sub">Visual network architecture builder</div></div><button class="btn btn-primary btn-sm" onclick="ai('Generate a complete production VPC architecture: 3 AZs with public/private/database subnets, NAT gateways, Transit Gateway for multi-VPC connectivity, VPC endpoints for all AWS services, Network Firewall, Flow Logs to S3, and DNS with Route53 Resolver. Full Terraform module.')">Generate Architecture ↗</button></div>
+<div class="vpc-grid">
+  <div class="vpc-card"><div class="vpc-title">🟢 prod-vpc · 10.0.0.0/16<button class="btn btn-ghost btn-sm" onclick="ai('Create a Terraform VPC module: 3 AZs, public subnets 10.0.1-3.0/24, private app subnets 10.0.11-13.0/24, private DB subnets 10.0.21-23.0/24, NAT gateways, route tables, flow logs, VPC endpoints for S3/DynamoDB/ECR/SSM.')">Edit ↗</button></div>
+    <div class="subnet subnet-pub"><div class="subnet-name">Public Subnets (x3 AZs)</div><div class="subnet-cidr">10.0.1.0/24 · 10.0.2.0/24 · 10.0.3.0/24</div><div class="subnet-items"><span class="sitem">ALB</span><span class="sitem">NAT GW</span><span class="sitem">Bastion</span></div></div>
+    <div class="subnet subnet-priv"><div class="subnet-name">Private App Subnets (x3 AZs)</div><div class="subnet-cidr">10.0.11.0/24 · 10.0.12.0/24 · 10.0.13.0/24</div><div class="subnet-items"><span class="sitem">ECS</span><span class="sitem">EKS</span><span class="sitem">Lambda</span><span class="sitem">EC2</span></div></div>
+    <div class="subnet" style="border-left:2px solid var(--blue)"><div class="subnet-name">Database Subnets (x3 AZs)</div><div class="subnet-cidr">10.0.21.0/24 · 10.0.22.0/24 · 10.0.23.0/24</div><div class="subnet-items"><span class="sitem">RDS</span><span class="sitem">ElastiCache</span><span class="sitem">OpenSearch</span></div></div>
+  </div>
+  <div>
+    <div class="wfc wfc-teal" style="margin-bottom:.7rem;" onclick="ai('Design a Transit Gateway hub-and-spoke architecture: prod VPC, staging VPC, shared services VPC (DNS, bastion, monitoring), on-premises via VPN/Direct Connect. Include route table design, TGW route tables, and Terraform module.')"><div class="wfc-ico">⬡</div><div class="wfc-name">Transit Gateway Hub</div><div class="wfc-desc">Multi-VPC connectivity with centralized routing and Direct Connect</div><div class="wfc-tags"><span class="wfc-tag wt-t">TGW</span><span class="wfc-tag wt-b">Direct Connect</span></div></div>
+    <div class="wfc wfc-orange" onclick="ai('Set up AWS Network Firewall in a centralized inspection VPC architecture: firewall policy with stateful rules for east-west traffic, Suricata-compatible IDS rules, domain-based egress filtering, centralized flow logs, and Terraform module.')"><div class="wfc-ico">🔥</div><div class="wfc-name">Network Firewall</div><div class="wfc-desc">Centralized inspection VPC, stateful rules, domain filtering, IDS</div><div class="wfc-tags"><span class="wfc-tag wt-o">Firewall</span><span class="wfc-tag wt-r">IDS</span></div></div>
+  </div>
+</div></div></div>
+
+<div class="panel" id="panel-apigw"><div class="scroll"><div class="ph"><div class="ph-left"><div class="ph-title">API Gateway Studio</div></div><button class="btn btn-primary btn-sm" onclick="ai('Design a production API Gateway setup: REST API with Lambda integration, Cognito JWT authorizer, usage plans and API keys, WAF association, custom domain with ACM, canary deployments, CloudWatch metrics dashboard, X-Ray tracing, and CDK code for the full setup.')">Build API Stack ↗</button></div>
+<div class="wf-grid"><div class="wfc wfc-blue" onclick="ai('Create a GraphQL API using AWS AppSync: schema definition for a social media app, DynamoDB resolvers, real-time subscriptions via WebSocket, Cognito authentication, fine-grained authorization with field-level permissions, and CDK deployment code.')"><div class="wfc-ico">◈</div><div class="wfc-name">AppSync GraphQL API</div><div class="wfc-desc">Real-time subscriptions, DynamoDB resolvers, Cognito auth, CDK deployment</div><div class="wfc-tags"><span class="wfc-tag wt-b">AppSync</span><span class="wfc-tag wt-t">GraphQL</span></div></div>
+<div class="wfc wfc-teal" onclick="ai('Build an API Gateway HTTP API with: Lambda integration, JWT authorizer with Cognito, CORS configuration, VPC link to internal NLB, request validation, rate limiting, access logs to CloudWatch, and Terraform module.')"><div class="wfc-ico">⤵</div><div class="wfc-name">HTTP API + JWT Auth</div><div class="wfc-desc">HTTP API with Cognito JWT, VPC link, rate limiting, access logs</div><div class="wfc-tags"><span class="wfc-tag wt-t">HTTP API</span><span class="wfc-tag wt-o">Cognito</span></div></div>
+<div class="wfc wfc-orange" onclick="ai('Create an API Gateway WebSocket API for real-time features: connect/disconnect/message Lambda functions, DynamoDB connection store, broadcasting to multiple connections, IAM authorization, integration with SNS for fan-out, and CloudFormation template.')"><div class="wfc-ico">⚡</div><div class="wfc-name">WebSocket Real-time API</div><div class="wfc-desc">WebSocket with DynamoDB connection store, SNS fan-out broadcasting</div><div class="wfc-tags"><span class="wfc-tag wt-o">WebSocket</span><span class="wfc-tag wt-p">SNS</span></div></div>
+</div></div></div>
+
+<div class="panel" id="panel-cdn"><div class="scroll"><div class="ph"><div class="ph-left"><div class="ph-title">CloudFront / CDN</div></div><button class="btn btn-primary btn-sm" onclick="ai('Create a production CloudFront distribution: S3 origin with OAC, ALB origin for API, multiple origins with path-based routing, cache behaviors, WAF WebACL, custom error pages, security headers via Lambda@Edge, ACM certificate, Route53 record, and Terraform module.')">Full CDN Stack ↗</button></div>
+<div class="wf-grid"><div class="wfc wfc-orange" onclick="ai('Write Lambda@Edge functions for CloudFront: A/B testing by cookie, geolocation-based content routing, security headers injection (HSTS, CSP, X-Frame-Options), request authentication with JWT validation at edge, and URL rewrites for SPA routing. Include CloudFormation.')"><div class="wfc-ico">⚡</div><div class="wfc-name">Lambda@Edge Functions</div><div class="wfc-desc">A/B testing, geo-routing, security headers, JWT auth at edge, SPA routing</div></div>
+<div class="wfc wfc-teal" onclick="ai('Set up CloudFront real-time logs and standard logs: Kinesis Data Streams for real-time log delivery, Athena queries for access pattern analysis, Grafana dashboard with CloudFront metrics, and anomaly detection for DDoS patterns using CloudWatch Contributor Insights.')"><div class="wfc-ico">📊</div><div class="wfc-name">CDN Analytics</div><div class="wfc-desc">Real-time logs to Kinesis, Athena analysis, Grafana dashboard, DDoS detection</div></div>
+</div></div></div>
+
+<div class="panel" id="panel-waf"><div class="scroll"><div class="ph"><div class="ph-left"><div class="ph-title">WAF & Shield</div></div><button class="btn btn-primary btn-sm" onclick="ai('Create a comprehensive WAF configuration for CloudFront and ALB: AWS Managed Rules (Core, SQLi, XSS, Known Bad Inputs, IP Reputation), rate limiting per IP, geo-blocking for non-operating countries, custom rules for your app, logging to S3, and Terraform module.')">Configure WAF ↗</button></div>
+<div class="wf-grid"><div class="wfc wfc-red" onclick="ai('Build a WAF automation system: Lambda function that monitors WAF logs for attack patterns, automatically adds IPs to IP set on threshold breach, SNS alerts for high-severity blocks, weekly report of top attackers, and automatic IP expiry after 24 hours. Include all code.')"><div class="wfc-ico">🤖</div><div class="wfc-name">Auto IP Blocking Bot</div><div class="wfc-desc">Monitors WAF logs, auto-blocks attacking IPs, weekly threat report</div></div>
+<div class="wfc wfc-orange" onclick="ai('Set up AWS Shield Advanced: enable for ALB, CloudFront, Route53, EC2 EIP. Configure DDoS response team access, proactive engagement, cost protection, and SRT runbook integration. Include health-based detection with CloudWatch metrics.')"><div class="wfc-ico">🛡</div><div class="wfc-name">Shield Advanced</div><div class="wfc-desc">DDoS protection with SRT access, cost protection, proactive engagement</div></div>
+</div></div></div>
+
+<div class="panel" id="panel-datapipe"><div class="scroll"><div class="ph"><div class="ph-left"><div class="ph-title">Data Pipelines</div></div><button class="btn btn-primary btn-sm" onclick="ai('Design an end-to-end data pipeline: Kinesis ingestion, Lambda transformation, S3 data lake, Glue ETL, Redshift warehouse, and QuickSight dashboards. Include CDK infrastructure, PySpark Glue job code, and cost optimization tips.')">Build Pipeline ↗</button></div>
+<div class="wf-grid"><div class="wfc wfc-blue" onclick="ai('Write a complete AWS Glue ETL job in PySpark: read from S3, schema validation and data quality checks with Glue Data Quality, transformation with DynamicFrame, partitioned write to S3 in Parquet format, Glue Data Catalog table update, and job metrics. Include CDK deployment.')"><div class="wfc-ico">⚙</div><div class="wfc-name">Glue ETL Pipeline</div><div class="wfc-desc">PySpark ETL with data quality, Parquet output, catalog updates, CDK deployment</div></div>
+<div class="wfc wfc-purple" onclick="ai('Build an Apache Airflow (MWAA) workflow on AWS: DAG for daily data processing, S3 sensors, Glue job operators, Redshift COPY operator, email failure alerts, backfill strategy, and infrastructure-as-code with Terraform for the MWAA environment.')"><div class="wfc-ico">🌊</div><div class="wfc-name">MWAA Airflow Workflows</div><div class="wfc-desc">Managed Airflow with Glue, Redshift operators, S3 sensors, Terraform infra</div></div>
+<div class="wfc wfc-teal" onclick="ai('Create an EventBridge Pipes data integration: DynamoDB Stream → EventBridge Pipe with Lambda enrichment → SQS target, Kinesis → Pipe with filtering → Step Functions, and S3 event → Pipe → API destination. Include CDK code for all three patterns.')"><div class="wfc-ico">⤵</div><div class="wfc-name">EventBridge Pipes</div><div class="wfc-desc">DynamoDB Streams, Kinesis, S3 events with filtering and enrichment</div></div>
+</div></div></div>
+
+<div class="panel" id="panel-fargate"><div class="scroll"><div class="ph"><div class="ph-left"><div class="ph-title">ECS / Fargate</div></div><button class="btn btn-primary btn-sm" onclick="ai('Create a production ECS Fargate cluster: task definitions for frontend and backend services, service auto scaling, ALB with target groups, ECR repositories, CodePipeline for deployments, Service Connect for service-to-service communication, EFS for shared storage, Terraform module.')">Full ECS Stack ↗</button></div>
+<div class="wf-grid"><div class="wfc wfc-teal" onclick="ai('Set up ECS Service Connect (the App Mesh replacement) for service discovery: namespace configuration, Service Connect proxy in each task definition, client alias setup, health checks, CloudWatch metrics for service-to-service traffic, and migration guide from Cloud Map.')"><div class="wfc-ico">🔗</div><div class="wfc-name">Service Connect</div><div class="wfc-desc">Native service-to-service networking with observability, replaces App Mesh</div></div>
+<div class="wfc wfc-blue" onclick="ai('Build a Fargate Spot cost optimization: mixed capacity providers with 70% Spot / 30% on-demand, capacity provider strategy, Fargate Spot interruption handling with SIGTERM grace period, bin packing task placement, and estimated savings calculation vs all on-demand.')"><div class="wfc-ico">💰</div><div class="wfc-name">Fargate Spot Optimization</div><div class="wfc-desc">70% Spot with graceful interruption handling, capacity providers, 60% cost savings</div></div>
+</div></div></div>
+
+<div class="panel" id="panel-logs"><div class="scroll"><div class="ph"><div class="ph-left"><div class="ph-title">Log Analytics</div></div><button class="btn btn-primary btn-sm" onclick="ai('Write 15 essential CloudWatch Logs Insights queries: Lambda errors with full stack traces, slow API calls over 2 seconds, failed authentication attempts, EC2 disk warnings, VPC flow log anomalies, application exceptions grouped by type, and ECS container OOM kills.')">Query Library ↗</button></div>
+<div class="wf-grid"><div class="wfc wfc-blue" onclick="ai('Set up centralized logging architecture: CloudWatch Logs → Kinesis Data Firehose → S3 with intelligent tiering, cross-account log aggregation via resource policies, OpenSearch Service for log search (or CloudWatch Logs Insights), metric filters for key patterns, and Terraform deployment.')"><div class="wfc-ico">📥</div><div class="wfc-name">Centralized Log Archive</div><div class="wfc-desc">Cross-account aggregation, Firehose to S3, OpenSearch, metric filters</div></div>
+<div class="wfc wfc-orange" onclick="ai('Build anomaly detection for application logs: CloudWatch Logs anomaly detection setup, custom metric filters for error patterns, ML-based baseline alarms, EventBridge integration to create OpsCenter OpsItems, and Slack notification Lambda for critical log patterns.')"><div class="wfc-ico">🔍</div><div class="wfc-name">Log Anomaly Detection</div><div class="wfc-desc">ML-based pattern detection, OpsCenter integration, Slack alerts</div></div>
+</div></div></div>
+
+<div class="panel" id="panel-tracing"><div class="scroll"><div class="ph"><div class="ph-left"><div class="ph-title">Distributed Tracing</div></div><button class="btn btn-primary btn-sm" onclick="ai('Set up distributed tracing with AWS X-Ray and OpenTelemetry: instrument Lambda, ECS, and API Gateway with auto-instrumentation, create X-Ray groups and sampling rules, build a service map, create CloudWatch ServiceLens dashboard, and integrate with Grafana Tempo.')">Setup Tracing ↗</button></div>
+<div class="wf-grid"><div class="wfc wfc-purple" onclick="ai('Configure OpenTelemetry on EKS: AWS Distro for OpenTelemetry operator, auto-instrumentation for Java/Python/Node.js pods, OTLP collector DaemonSet, export to X-Ray and CloudWatch metrics, Grafana dashboard with traces, and Helm chart configuration.')"><div class="wfc-ico">⬡</div><div class="wfc-name">OpenTelemetry on EKS</div><div class="wfc-desc">ADOT auto-instrumentation, OTLP collector, X-Ray + Grafana integration</div></div>
+<div class="wfc wfc-teal" onclick="ai('Create X-Ray tracing groups and analytics: custom groups for each microservice, sampling rules to capture 100% of errors and 5% of normal traffic, CloudWatch ServiceLens integration, and Lambda Insights setup for function-level performance analysis.')"><div class="wfc-ico">📡</div><div class="wfc-name">X-Ray Service Map</div><div class="wfc-desc">Sampling rules, service groups, CloudWatch ServiceLens, Lambda Insights</div></div>
+</div></div></div>
+
+<div class="panel" id="panel-incidents"><div class="scroll"><div class="ph"><div class="ph-left"><div class="ph-title">Incident Response</div></div><button class="btn btn-primary btn-sm" onclick="ai('Create an automated incident response playbook for AWS: GuardDuty finding → EventBridge → Lambda that isolates compromised EC2 (remove from ASG, add quarantine SG), revokes IAM credentials, takes EBS snapshot for forensics, creates PagerDuty incident, and posts to Slack. Include all Lambda code.')">Automate Response ↗</button></div>
+<div class="wf-grid">
+  <div class="wfc wfc-red" onclick="ai('Write a complete EC2 compromise response runbook with automated Lambda: 1) Isolate instance (quarantine SG), 2) Capture volatile memory via SSM, 3) Create forensic EBS snapshot, 4) Terminate from ASG, 5) Revoke instance role credentials, 6) Preserve evidence in S3. Include the Lambda code.')"><div class="wfc-ico">🔴</div><div class="wfc-name">EC2 Compromise Response</div><div class="wfc-desc">Isolate → Memory capture → Snapshot → Terminate → Revoke credentials</div></div>
+  <div class="wfc wfc-orange" onclick="ai('Create a credential exposure response Lambda: triggered by GuardDuty finding or manual alert. Steps: immediately disable compromised IAM access keys, list and revoke all active sessions, check CloudTrail for actions taken with the key, generate impact report, and rotate secrets. Include code.')"><div class="wfc-ico">🔑</div><div class="wfc-name">Credential Exposure Response</div><div class="wfc-desc">Instant key disable, session revocation, CloudTrail impact analysis</div></div>
+  <div class="wfc wfc-teal" onclick="ai('Build a ransomware detection and response system: CloudWatch Logs metric filters for mass S3 delete/encrypt patterns, GuardDuty integration, automated response Lambda that enables S3 Object Lock, blocks IAM user, preserves evidence, and triggers DR failover. Include CloudFormation.')"><div class="wfc-ico">🛡</div><div class="wfc-name">Ransomware Defense</div><div class="wfc-desc">Mass delete detection, auto Object Lock, IAM block, DR trigger</div></div>
+</div></div></div>
+
+<div class="panel" id="panel-runbooks"><div class="scroll"><div class="ph"><div class="ph-left"><div class="ph-title">Runbook Library</div></div><button class="btn btn-primary btn-sm" onclick="ai('Create a library of 10 essential AWS operational runbooks: database failover, EC2 instance recovery, certificate renewal, scaling a service under load, rotating IAM credentials, responding to a GuardDuty alert, RDS snapshot restore, Lambda function rollback, EKS node drain, and S3 data recovery.')">Generate Library ↗</button></div>
+<div class="wf-grid">
+  <div class="wfc wfc-orange" onclick="ai('Write a detailed RDS failover runbook with automated and manual steps: detect primary failure, promote read replica, update connection strings via Secrets Manager, application restart procedure, validation steps, communication template, and post-incident review checklist.')"><div class="wfc-ico">🗄</div><div class="wfc-name">RDS Failover Runbook</div><div class="wfc-desc">Detect → Promote replica → Update connections → Validate → Communicate</div></div>
+  <div class="wfc wfc-teal" onclick="ai('Write a production incident response runbook template: severity classification matrix, escalation paths, communication templates (internal/external), war room setup, timeline documentation, 5-whys root cause analysis, action items tracking, and post-mortem template.')"><div class="wfc-ico">📋</div><div class="wfc-name">Incident Response Template</div><div class="wfc-desc">Severity matrix, escalation paths, war room, post-mortem template</div></div>
+  <div class="wfc wfc-blue" onclick="ai('Create a certificate expiry management runbook: Lambda function to check all ACM, IAM, and self-managed certificates, alert 60/30/7 days before expiry, automated renewal for ACM, manual renewal checklist for others, and an EventBridge schedule for weekly scans.')"><div class="wfc-ico">🔐</div><div class="wfc-name">Certificate Management</div><div class="wfc-desc">ACM auto-renewal, expiry alerts 60/30/7 days, weekly audit scans</div></div>
+</div></div></div>
+
+<div class="panel" id="panel-savings"><div class="scroll"><div class="ph"><div class="ph-left"><div class="ph-title">Savings Planner</div></div><button class="btn btn-primary btn-sm" onclick="ai('Analyze my AWS infrastructure for Reserved Instance and Savings Plans opportunities. I have 47 EC2 instances running steadily. Compare: 1-year vs 3-year, No Upfront vs Partial Upfront vs All Upfront, Compute Savings Plans vs EC2 Instance Savings Plans. Show ROI, breakeven, and recommendation.')">Savings Analysis ↗</button></div>
+<div class="stats-grid stats-3">
+  <div class="stat stat-g"><div class="stat-label">Potential Monthly Savings</div><div class="stat-val s-g">$2,840</div><div class="stat-sub">Across all recommendations</div></div>
+  <div class="stat stat-o"><div class="stat-label">1-Year Savings Plans ROI</div><div class="stat-val s-o">34%</div><div class="stat-sub">Breakeven: 7 months</div></div>
+  <div class="stat stat-b"><div class="stat-label">Reserved Instance Savings</div><div class="stat-val s-b">$960/mo</div><div class="stat-sub">For 32 steady-state instances</div></div>
+</div>
+<div class="wf-grid">
+  <div class="wfc wfc-green" onclick="ai('Calculate the exact Compute Savings Plans to purchase for my EC2 fleet: 47 instances mix of t3.micro, t3.large, m5.xlarge, c5.2xlarge. Show the hourly commitment amount, 1-year vs 3-year comparison, No/Partial/All Upfront analysis, and the AWS CLI purchase command.')"><div class="wfc-ico">💡</div><div class="wfc-name">Compute Savings Plans</div><div class="wfc-desc">Flexible discount for EC2, Lambda, Fargate — calculate optimal commitment</div></div>
+  <div class="wfc wfc-teal" onclick="ai('Calculate RDS Reserved Instance recommendations: my 8 RDS instances (mix of db.t3, db.m5, db.r5 across MySQL and PostgreSQL). Show which instances qualify for RIs, 1-year Multi-AZ pricing, savings vs on-demand, and the AWS CLI purchase command.')"><div class="wfc-ico">🗄</div><div class="wfc-name">RDS Reserved Instances</div><div class="wfc-desc">Calculate RI savings for 8 RDS instances — up to 42% discount</div></div>
+  <div class="wfc wfc-orange" onclick="ai('Calculate Spot Instance savings for my workloads: identify which EC2 instances can use Spot (stateless, fault-tolerant), calculate savings at 70% discount, design mixed Auto Scaling Group with Spot/On-Demand, and handle Spot interruptions gracefully.')"><div class="wfc-ico">💥</div><div class="wfc-name">Spot Instance Strategy</div><div class="wfc-desc">Identify Spot candidates, mixed ASG design, interruption handling</div></div>
+</div></div></div>
+
+<div class="panel" id="panel-team"><div class="scroll"><div class="ph"><div class="ph-left"><div class="ph-title">Team & Roles</div></div><button class="btn btn-primary btn-sm" onclick="ai('Design an AWS multi-account team permission structure: developer access (dev account only), senior developer (staging), DevOps (all accounts read + prod deploy), security team (read-only all + security services full), and billing admin. Use AWS SSO with permission sets. Include Terraform.')">Setup Permissions ↗</button></div>
+<div class="card"><div class="card-head"><div class="card-title">👥 Team Members</div></div>
+<div class="card-body"><table class="tbl"><tr><th>Member</th><th>Role</th><th>Access Level</th><th>Last Active</th><th>MFA</th></tr>
+  <tr><td>devops-admin</td><td>DevOps Lead</td><td><span class="badge bg-r">Admin</span></td><td>2 min ago</td><td><span class="badge bg-g">✓</span></td></tr>
+  <tr><td>dev01</td><td>Developer</td><td><span class="badge bg-r">Admin ⚠</span></td><td>3h ago</td><td><span class="badge bg-r">✗</span></td></tr>
+  <tr><td>jane.smith</td><td>Senior Dev</td><td><span class="badge bg-o">Developer</span></td><td>1h ago</td><td><span class="badge bg-g">✓</span></td></tr>
+  <tr><td>security-audit</td><td>Security</td><td><span class="badge bg-b">Read-only</span></td><td>1d ago</td><td><span class="badge bg-g">✓</span></td></tr>
+  <tr><td>data-sci-01</td><td>Data Scientist</td><td><span class="badge bg-t">Data Access</span></td><td>4h ago</td><td><span class="badge bg-g">✓</span></td></tr>
+</table></div></div></div></div>
+
+
+<div class="panel" id="panel-multicloud">
+<div class="scroll">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Multi-Cloud Command Center</div>
+      <div class="ph-sub">AWS · Microsoft Azure · Google Cloud Platform — unified view</div>
+    </div>
+    <div class="ph-actions">
+      <button class="btn btn-ghost btn-sm" onclick="loadMultiCloud()">↺ Refresh</button>
+      <button class="btn btn-primary btn-sm" onclick="ai('Compare my AWS, Azure and GCP infrastructure. Which cloud is cheapest for my workloads? Give specific recommendations based on my real usage data.')">AI Compare Clouds ↗</button>
+    </div>
+  </div>
+
+  <!-- CLOUD STATUS CARDS -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-bottom:1.2rem;">
+
+    <!-- AWS Card -->
+    <div class="card" id="mc-aws-card">
+      <div class="card-head">
+        <div class="card-title">
+          <span style="font-size:1.1rem;">🟠</span> Amazon Web Services
+          <span class="badge bg-g" id="mc-aws-status">Checking...</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.8rem;">
+          <div class="stat stat-o" style="padding:.6rem;">
+            <div class="stat-label">EC2 VMs</div>
+            <div class="stat-val s-o" id="mc-aws-vms">—</div>
+          </div>
+          <div class="stat stat-t" style="padding:.6rem;">
+            <div class="stat-label">S3 Buckets</div>
+            <div class="stat-val s-t" id="mc-aws-storage">—</div>
+          </div>
+          <div class="stat stat-b" style="padding:.6rem;">
+            <div class="stat-label">Lambda Fns</div>
+            <div class="stat-val s-b" id="mc-aws-functions">—</div>
+          </div>
+          <div class="stat stat-r" style="padding:.6rem;">
+            <div class="stat-label">Monthly Cost</div>
+            <div class="stat-val s-r" id="mc-aws-cost">—</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="width:100%" onclick="ai('Analyze my AWS costs and suggest the top 3 ways to reduce my bill this month based on my actual usage.')">Optimize AWS ↗</button>
+      </div>
+    </div>
+
+    <!-- Azure Card -->
+    <div class="card" id="mc-azure-card">
+      <div class="card-head">
+        <div class="card-title">
+          <span style="font-size:1.1rem;">🔵</span> Microsoft Azure
+          <span class="badge bg-b" id="mc-azure-status">Checking...</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.8rem;">
+          <div class="stat stat-b" style="padding:.6rem;">
+            <div class="stat-label">Virtual Machines</div>
+            <div class="stat-val s-b" id="mc-azure-vms">—</div>
+          </div>
+          <div class="stat stat-t" style="padding:.6rem;">
+            <div class="stat-label">Storage Accounts</div>
+            <div class="stat-val s-t" id="mc-azure-storage">—</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="width:100%;margin-bottom:.4rem;" onclick="showPanel('azure')">View Azure Resources</button>
+        <button class="btn btn-ghost btn-sm" style="width:100%" onclick="ai('Compare Azure VM pricing vs AWS EC2 for my current workloads. Which is cheaper and by how much?')">Compare vs AWS ↗</button>
+      </div>
+    </div>
+
+    <!-- GCP Card -->
+    <div class="card" id="mc-gcp-card">
+      <div class="card-head">
+        <div class="card-title">
+          <span style="font-size:1.1rem;">🟢</span> Google Cloud Platform
+          <span class="badge bg-g" id="mc-gcp-status">Checking...</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.8rem;">
+          <div class="stat stat-g" style="padding:.6rem;">
+            <div class="stat-label">Compute VMs</div>
+            <div class="stat-val s-g" id="mc-gcp-vms">—</div>
+          </div>
+          <div class="stat stat-t" style="padding:.6rem;">
+            <div class="stat-label">GCS Buckets</div>
+            <div class="stat-val s-t" id="mc-gcp-storage">—</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="width:100%;margin-bottom:.4rem;" onclick="showPanel('gcp')">View GCP Resources</button>
+        <button class="btn btn-ghost btn-sm" style="width:100%" onclick="ai('Compare Google Cloud pricing vs AWS for compute and storage. What would I save by migrating some workloads to GCP?')">Compare vs AWS ↗</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- AI RECOMMENDATIONS -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">🤖 AI Multi-Cloud Recommendations</div>
+      <button class="btn btn-primary btn-sm" onclick="ai('Based on my multi-cloud setup with AWS, Azure, and GCP, give me 5 specific recommendations to optimize costs, improve reliability, and use each cloud for what it does best.')">Generate Analysis ↗</button>
+    </div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;">
+
+        <div class="rec-card rc-o" onclick="ai('What AWS services should I use for high-performance compute workloads? Compare EC2 instance types and give me the best price-performance option for a web application.')">
+          <div class="rec-ico">💡</div>
+          <div class="rec-body">
+            <div class="rec-title">Best for Compute</div>
+            <div class="rec-desc">AWS EC2 vs Azure VMs vs GCP Compute — which is fastest and cheapest for your workload?</div>
+            <div class="rec-save rs-o">Click for AI analysis ↗</div>
+          </div>
+        </div>
+
+        <div class="rec-card rc-b" onclick="ai('Compare AWS S3 vs Azure Blob Storage vs GCP Cloud Storage pricing for storing 1TB of data with frequent reads. Which cloud storage is cheapest and what are the egress cost differences?')">
+          <div class="rec-ico">🗄</div>
+          <div class="rec-body">
+            <div class="rec-title">Best for Storage</div>
+            <div class="rec-desc">AWS S3 vs Azure Blob vs GCP Cloud Storage — compare costs for 1TB with your usage pattern</div>
+            <div class="rec-save rs-g">Click for AI analysis ↗</div>
+          </div>
+        </div>
+
+        <div class="rec-card rc-g" onclick="ai('Compare AWS Lambda vs Azure Functions vs Google Cloud Functions pricing and performance. Which serverless platform is best for a high-volume event-driven application processing 10M requests per month?')">
+          <div class="rec-ico">⚡</div>
+          <div class="rec-body">
+            <div class="rec-title">Best for Serverless</div>
+            <div class="rec-desc">AWS Lambda vs Azure Functions vs Cloud Functions — pricing for 10M requests/month</div>
+            <div class="rec-save rs-g">Click for AI analysis ↗</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- WORKFLOW GRID FOR MULTICLOUD -->
+  <div class="card" style="margin-top:.8rem;">
+    <div class="card-head"><div class="card-title">⚙ Multi-Cloud Automation Workflows</div></div>
+    <div class="card-body">
+      <div class="wf-grid">
+        <div class="wfc wfc-orange" onclick="ai('Write a Terraform configuration to deploy the same web application on AWS, Azure, and GCP simultaneously with a global load balancer routing traffic to the cheapest available region. Include all provider configs and modules.')">
+          <div class="wfc-ico">🌍</div>
+          <div class="wfc-name">Deploy to All 3 Clouds</div>
+          <div class="wfc-desc">Terraform config to deploy simultaneously on AWS, Azure, and GCP with global routing</div>
+          <div class="wfc-tags"><span class="wfc-tag wt-o">Terraform</span><span class="wfc-tag wt-b">Multi-Cloud</span></div>
+        </div>
+        <div class="wfc wfc-blue" onclick="ai('Write a cost comparison script using AWS Cost Explorer, Azure Cost Management API, and GCP Billing API to generate a unified monthly cost report across all 3 clouds. Include Python code and scheduling with cron.')">
+          <div class="wfc-ico">💰</div>
+          <div class="wfc-name">Unified Cost Report</div>
+          <div class="wfc-desc">Compare monthly spending across AWS, Azure, and GCP in one unified report</div>
+          <div class="wfc-tags"><span class="wfc-tag wt-b">Cost APIs</span><span class="wfc-tag wt-g">Python</span></div>
+        </div>
+        <div class="wfc wfc-teal" onclick="ai('Create a multi-cloud backup strategy: replicate critical data from AWS S3 to Azure Blob Storage and GCP Cloud Storage automatically. Include Python script with boto3, Azure SDK, and GCP Storage client. Add encryption and verification.')">
+          <div class="wfc-ico">🔄</div>
+          <div class="wfc-name">Cross-Cloud Backup</div>
+          <div class="wfc-desc">Replicate data from AWS S3 to Azure Blob and GCP Storage automatically</div>
+          <div class="wfc-tags"><span class="wfc-tag wt-t">S3</span><span class="wfc-tag wt-b">Azure Blob</span><span class="wfc-tag wt-g">GCS</span></div>
+        </div>
+        <div class="wfc wfc-green" onclick="ai('Design a multi-cloud disaster recovery architecture: primary on AWS, failover to Azure, last resort on GCP. Include Route53 health checks, Azure Traffic Manager, and GCP Cloud DNS for automatic failover. Write the Terraform for all three.')">
+          <div class="wfc-ico">🛡</div>
+          <div class="wfc-name">Multi-Cloud DR</div>
+          <div class="wfc-desc">Disaster recovery across 3 clouds — automatic failover AWS → Azure → GCP</div>
+          <div class="wfc-tags"><span class="wfc-tag wt-g">DR</span><span class="wfc-tag wt-o">Failover</span></div>
+        </div>
+        <div class="wfc wfc-purple" onclick="ai('Write a Kubernetes federation setup to run a single workload across AWS EKS, Azure AKS, and GCP GKE simultaneously using KubeFed or Admiralty. Include the manifests and cost comparison per node type.')">
+          <div class="wfc-ico">☸</div>
+          <div class="wfc-name">Multi-Cloud Kubernetes</div>
+          <div class="wfc-desc">Run workloads across EKS, AKS, and GKE simultaneously with federation</div>
+          <div class="wfc-tags"><span class="wfc-tag wt-p">EKS</span><span class="wfc-tag wt-b">AKS</span><span class="wfc-tag wt-g">GKE</span></div>
+        </div>
+        <div class="wfc wfc-orange" onclick="ai('Create a unified IAM/identity federation across AWS, Azure, and GCP using a single identity provider (Okta or Azure AD). Users log in once and get access to all 3 clouds. Include SAML/OIDC configuration for each cloud.')">
+          <div class="wfc-ico">🔑</div>
+          <div class="wfc-name">Unified Identity</div>
+          <div class="wfc-desc">Single sign-on across AWS, Azure, and GCP with one identity provider</div>
+          <div class="wfc-tags"><span class="wfc-tag wt-o">SSO</span><span class="wfc-tag wt-b">SAML</span><span class="wfc-tag wt-g">OIDC</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- AZURE PANEL -->
+<div class="panel" id="panel-azure">
+<div class="scroll">
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">Azure Resources</div><div class="ph-sub">Microsoft Azure · Live data</div></div>
+    <button class="btn btn-primary btn-sm" onclick="ai('Analyze my Azure resources and suggest cost optimizations. Compare pricing with equivalent AWS services and recommend where to migrate for savings.')">AI Optimize ↗</button>
+  </div>
+  <div class="stats-grid stats-2" style="margin-bottom:1rem;">
+    <div class="stat stat-b"><div class="stat-label">Virtual Machines</div><div class="stat-val s-b" id="azure-vm-count">Loading...</div></div>
+    <div class="stat stat-t"><div class="stat-label">Storage Accounts</div><div class="stat-val s-t" id="azure-storage-count">Loading...</div></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">💻 Azure Virtual Machines</div><button class="btn btn-ghost btn-sm" onclick="loadAzureVMs()">Refresh</button></div>
+    <div class="card-body" id="azure-vms-body"><div class="empty-state">Loading Azure VMs...</div></div>
+  </div>
+  <div class="wf-grid" style="margin-top:.8rem;">
+    <div class="wfc wfc-blue" onclick="ai('Write Azure CLI commands to create a production VM with managed disks, availability zones, network security group, and auto-shutdown schedule. Include ARM template.')">
+      <div class="wfc-ico">💻</div>
+      <div class="wfc-name">Create Azure VM</div>
+      <div class="wfc-desc">Production VM with managed disks, NSG, and auto-shutdown</div>
+    </div>
+    <div class="wfc wfc-teal" onclick="ai('Compare Azure App Service vs AWS Elastic Beanstalk vs GCP App Engine for deploying a Node.js application. Include pricing, scaling, and deployment complexity.')">
+      <div class="wfc-ico">⚖</div>
+      <div class="wfc-name">Compare App Services</div>
+      <div class="wfc-desc">Azure App Service vs AWS Beanstalk vs GCP App Engine</div>
+    </div>
+    <div class="wfc wfc-orange" onclick="ai('Write a GitHub Actions workflow to deploy a containerized app to Azure Container Apps, with Azure Container Registry, managed identity, and blue/green deployment.')">
+      <div class="wfc-ico">🐳</div>
+      <div class="wfc-name">Azure Container Apps</div>
+      <div class="wfc-desc">Deploy containers to Azure with GitHub Actions and ACR</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- GCP PANEL -->
+<div class="panel" id="panel-gcp">
+<div class="scroll">
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">Google Cloud Platform</div><div class="ph-sub">Project: <span id="gcp-project-id">Loading...</span></div></div>
+    <button class="btn btn-primary btn-sm" onclick="ai('Analyze my GCP resources and suggest cost optimizations. Compare pricing with equivalent AWS services.')">AI Optimize ↗</button>
+  </div>
+  <div class="stats-grid stats-2" style="margin-bottom:1rem;">
+    <div class="stat stat-g"><div class="stat-label">Compute Instances</div><div class="stat-val s-g" id="gcp-vm-count">Loading...</div></div>
+    <div class="stat stat-t"><div class="stat-label">GCS Buckets</div><div class="stat-val s-t" id="gcp-storage-count">Loading...</div></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">🖥 GCP Compute Instances</div><button class="btn btn-ghost btn-sm" onclick="loadGCPInstances()">Refresh</button></div>
+    <div class="card-body" id="gcp-instances-body"><div class="empty-state">Loading GCP instances...</div></div>
+  </div>
+  <div class="wf-grid" style="margin-top:.8rem;">
+    <div class="wfc wfc-green" onclick="ai('Write gcloud CLI commands and Terraform to create a GCP Compute Engine instance with custom machine type, persistent disk, firewall rules, and startup script. Include the equivalent AWS CloudFormation for comparison.')">
+      <div class="wfc-ico">🖥</div>
+      <div class="wfc-name">Create GCP Instance</div>
+      <div class="wfc-desc">Compute Engine with custom machine type and startup script</div>
+    </div>
+    <div class="wfc wfc-blue" onclick="ai('Compare BigQuery vs AWS Athena vs Azure Synapse for analytics on 1TB of data. Include query pricing, performance, and setup complexity.')">
+      <div class="wfc-ico">📊</div>
+      <div class="wfc-name">BigQuery vs Athena</div>
+      <div class="wfc-desc">Compare analytics costs: BigQuery vs Athena vs Synapse</div>
+    </div>
+    <div class="wfc wfc-teal" onclick="ai('Write a Terraform configuration to deploy a GKE cluster with autopilot mode, workload identity, node auto-provisioning, and compare the cost with equivalent EKS setup on AWS.')">
+      <div class="wfc-ico">☸</div>
+      <div class="wfc-name">GKE Autopilot</div>
+      <div class="wfc-desc">GKE with autopilot, workload identity — compare with EKS</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+// ─── MULTI-CLOUD DATA LOADING ─────────────────────────────────────────────
+async function loadMultiCloud() {
+  try {
+    const data = await fetch('https://nimbus-backend.onrender.com/api/multicloud').then(r => r.json());
+
+    // AWS
+    document.getElementById('mc-aws-status').textContent = data.aws?.status === 'connected' ? '✅ Connected' : '❌ Error';
+    document.getElementById('mc-aws-status').className = data.aws?.status === 'connected' ? 'badge bg-g' : 'badge bg-r';
+    document.getElementById('mc-aws-vms').textContent = data.aws?.vms ?? '—';
+    document.getElementById('mc-aws-storage').textContent = data.aws?.storage ?? '—';
+    document.getElementById('mc-aws-functions').textContent = data.aws?.functions ?? '—';
+    document.getElementById('mc-aws-cost').textContent = data.aws?.cost ? '$' + data.aws.cost : '—';
+
+    // Azure
+    const azStatus = data.azure?.status;
+    document.getElementById('mc-azure-status').textContent = azStatus === 'connected' ? '✅ Connected' : azStatus === 'not_configured' ? '⚙ Setup needed' : '❌ Error';
+    document.getElementById('mc-azure-status').className = azStatus === 'connected' ? 'badge bg-g' : 'badge bg-o';
+    document.getElementById('mc-azure-vms').textContent = data.azure?.vms ?? '—';
+    document.getElementById('mc-azure-storage').textContent = data.azure?.storage ?? '—';
+
+    // GCP
+    const gcpStatus = data.gcp?.status;
+    document.getElementById('mc-gcp-status').textContent = gcpStatus === 'connected' ? '✅ Connected' : gcpStatus === 'not_configured' ? '⚙ Setup needed' : '❌ Error';
+    document.getElementById('mc-gcp-status').className = gcpStatus === 'connected' ? 'badge bg-g' : 'badge bg-o';
+    document.getElementById('mc-gcp-vms').textContent = data.gcp?.vms ?? '—';
+    document.getElementById('mc-gcp-storage').textContent = data.gcp?.storage ?? '—';
+
+    if (data.gcp?.project) document.getElementById('gcp-project-id').textContent = data.gcp.project;
+
+  } catch (e) {
+    console.error('Multi-cloud load error:', e);
+  }
+}
+
+async function loadAzureVMs() {
+  try {
+    const data = await fetch('https://nimbus-backend.onrender.com/api/azure/vms').then(r => r.json());
+    document.getElementById('azure-vm-count').textContent = data.count || 0;
+    const body = document.getElementById('azure-vms-body');
+    if (!data.vms?.length) { body.innerHTML = '<div class="empty-state">No Azure VMs found or not configured</div>'; return; }
+    body.innerHTML = `<table class="tbl"><tr><th>Name</th><th>Location</th><th>Size</th><th>OS</th><th>Status</th></tr>
+      ${data.vms.map(vm => `<tr>
+        <td class="mono">${vm.name}</td>
+        <td>${vm.location}</td>
+        <td class="mono">${vm.size || '—'}</td>
+        <td>${vm.os || '—'}</td>
+        <td><span class="sdot sd-g"></span>${vm.status}</td>
+      </tr>`).join('')}
+    </table>`;
+  } catch (e) {
+    document.getElementById('azure-vms-body').innerHTML = '<div class="empty-state">Error loading Azure VMs. Check credentials.</div>';
+  }
+}
+
+async function loadGCPInstances() {
+  try {
+    const data = await fetch('https://nimbus-backend.onrender.com/api/gcp/instances').then(r => r.json());
+    document.getElementById('gcp-vm-count').textContent = data.count || 0;
+    const body = document.getElementById('gcp-instances-body');
+    if (!data.instances?.length) { body.innerHTML = '<div class="empty-state">No GCP instances found or not configured</div>'; return; }
+    body.innerHTML = `<table class="tbl"><tr><th>Name</th><th>Zone</th><th>Machine Type</th><th>Status</th></tr>
+      ${data.instances.map(i => `<tr>
+        <td class="mono">${i.name}</td>
+        <td class="mono">${i.zone}</td>
+        <td class="mono">${i.machineType || '—'}</td>
+        <td><span class="sdot sd-g"></span>${i.status}</td>
+      </tr>`).join('')}
+    </table>`;
+    // Load GCP storage count
+    const storageData = await fetch('https://nimbus-backend.onrender.com/api/gcp/storage').then(r => r.json());
+    document.getElementById('gcp-storage-count').textContent = storageData.count || 0;
+  } catch (e) {
+    document.getElementById('gcp-instances-body').innerHTML = '<div class="empty-state">Error loading GCP instances. Check credentials.</div>';
+  }
+}
+
+// Auto-load when panels are shown
+const origShowPanel = window.showPanel;
+window.showPanel = function(id) {
+  origShowPanel(id);
+  if (id === 'multicloud') loadMultiCloud();
+  if (id === 'azure') { loadAzureVMs(); }
+  if (id === 'gcp') { loadGCPInstances(); }
+};
+
+// Load on startup
+loadMultiCloud();
+</script>
+</div><!-- end content -->
+</div><!-- end app -->
+<script>
+// PANEL NAVIGATION
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+  const panel = document.getElementById('panel-' + id);
+  const nav = document.getElementById('nav-' + id);
+  if (panel) panel.classList.add('active');
+  if (nav) nav.classList.add('active');
+  if (id === 'ai') setTimeout(() => document.getElementById('chat-input')?.focus(), 100);
+}
+
+// AI CHAT
+const msgs = document.getElementById('chat-messages');
+
+function appendMsg(role, text) {
+  const d = document.createElement('div');
+  d.className = 'cm cm-' + role;
+  d.innerHTML = `<div class="cm-av">${role === 'ai' ? 'AI' : 'You'}</div>
+    <div class="cm-body">
+      <div class="cm-who">${role === 'ai' ? 'NimbusAI' : 'YOU'}</div>
+      <div class="cm-text">${text}</div>
+    </div>`;
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  const d = document.createElement('div');
+  d.className = 'cm cm-ai'; d.id = 'typing';
+  d.innerHTML = `<div class="cm-av">AI</div><div class="cm-body"><div class="cm-who">NimbusAI</div><div class="cm-text"><div class="typing-dots"><span></span><span></span><span></span></div></div></div>`;
+  msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight;
+}
+
+function clearTyping() { document.getElementById('typing')?.remove(); }
+
+function sendChat() {
+  const inp = document.getElementById('chat-input');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  showPanel('ai');
+  appendMsg('user', text);
+  showTyping();
+  const prompt = buildPrompt(text);
+  setTimeout(() => { clearTyping(); callAI(prompt); }, 700);
+}
+
+function fill(text) {
+  const inp = document.getElementById('chat-input');
+  if (inp) { inp.value = text; inp.focus(); }
+}
+
+function ai(prompt) {
+  showPanel('ai');
+  const short = prompt.length > 140 ? prompt.slice(0, 140) + '...' : prompt;
+  appendMsg('user', short);
+  showTyping();
+  setTimeout(() => { clearTyping(); callAI(buildPrompt(prompt)); }, 600);
+}
+
+function buildPrompt(userMsg) {
+  return `You are NimbusAI, an expert AWS DevOps engineer, solutions architect, and cloud automation specialist embedded in an enterprise AWS management platform.
+
+User environment: AWS production account, us-east-1 primary region, ECS Fargate + EKS workloads, Aurora PostgreSQL, 47 EC2 instances, CodePipeline CI/CD, $8,412/month spend.
+
+Provide detailed, production-ready responses. Include:
+- Actual code (CloudFormation YAML, Terraform HCL, Python boto3, CDK, bash CLI commands)
+- Formatted code blocks with language specified  
+- Specific AWS service names, API calls, ARN patterns
+- Security best practices and cost implications
+- Step-by-step implementation guidance
+
+User request: ${userMsg}`;
+}
+
+function clearChat() {
+  msgs.innerHTML = '';
+  appendMsg('ai', 'Chat cleared. How can I help you with your AWS infrastructure today?');
+}
+
+// IaC STUDIO
+const iacData = {
+  ec2: {
+    title: 'EC2 & Auto Scaling',
+    actions: [
+      { name: 'Production ASG + Launch Template', prompt: 'Write a complete CloudFormation template for an EC2 Auto Scaling Group: launch template with latest Amazon Linux 2023 AMI SSM parameter, instance profile, mixed instances policy with on-demand base 2 and spot for the rest, target tracking scaling on CPU 60%, lifecycle hooks, CloudWatch alarms, and SNS notifications.' },
+      { name: 'Right-size fleet script (boto3)', prompt: 'Write Python boto3 to analyze EC2 CPU and memory (CloudWatch agent) over 14 days for every running instance, recommend right-sizing moves, estimate monthly savings for each, and output a CSV report.' },
+      { name: 'AMI backup automation', prompt: 'Write a Lambda function with EventBridge schedule to create AMI backups of all EC2 instances tagged backup=true, name them INSTANCE_NAME-YYYY-MM-DD, copy to DR region, and delete AMIs older than 30 days. Include CloudFormation.' },
+      { name: 'Spot interruption handler', prompt: 'Write a Lambda function triggered by EC2 Spot interruption notice via EventBridge. It should: drain the instance from the ALB target group, deregister from ECS, send SNS alert, and log the event. Include CloudFormation.' },
+      { name: 'Instance scheduler', prompt: 'Write a Lambda + DynamoDB instance scheduler: start/stop EC2 and RDS by tag schedule, timezone support, DynamoDB override table, Slack slash command to extend by 2 hours, and weekly savings report via SES.' },
+      { name: 'Fleet SSM automation', prompt: 'Write SSM Automation documents and boto3 to: 1) Apply OS patches via SSM Patch Manager with approval workflow, 2) Run a compliance check script, 3) Collect inventory, 4) Push results to S3. Include IAM roles.' }
+    ]
+  },
+  vpc: {
+    title: 'VPC & Networking',
+    actions: [
+      { name: '3-AZ Production VPC (Terraform)', prompt: 'Write a complete Terraform VPC module: 3 AZs, public/private/database subnets, NAT gateways with HA option, VPC flow logs to S3, VPC endpoints for S3, DynamoDB, ECR API, ECR DKR, SSM, SSM Messages, EC2 Messages. All outputs for reuse.' },
+      { name: 'Transit Gateway hub-and-spoke', prompt: 'Write Terraform for Transit Gateway connecting: prod VPC (10.0.0.0/16), staging VPC (10.1.0.0/16), shared services VPC (10.2.0.0/16). Include TGW route tables, VPC attachments, and route propagation.' },
+      { name: 'Network Firewall (centralized)', prompt: 'Write CloudFormation for AWS Network Firewall in centralized inspection architecture: firewall VPC, stateful rules for known-bad domains, Suricata IDS rules, CloudWatch flow log alerts, and spoke VPC routing through firewall.' },
+      { name: 'VPC Peering automation', prompt: 'Write boto3 script to create VPC peering connections between a list of VPCs, accept them cross-account, update route tables in all subnets, and update security groups to allow traffic between peers.' },
+      { name: 'Security group auditor', prompt: 'Write boto3 to audit all security groups: find rules with 0.0.0.0/0 on any port, unused security groups (no ENI attachments), duplicate rules, and generate a risk-scored report with remediation recommendations.' }
+    ]
+  },
+  ecs: {
+    title: 'ECS Fargate',
+    actions: [
+      { name: 'Full Fargate service (Terraform)', prompt: 'Write a Terraform ECS Fargate service module: task definition with configurable containers, secrets from Secrets Manager via SSM, ALB target group, service auto scaling on CPU and SQS queue depth, CloudWatch log group, task role, execution role, security groups, and Service Connect.' },
+      { name: 'Blue/green CodeDeploy', prompt: 'Write CloudFormation for ECS blue/green deployment: CodeDeploy application, deployment group, AppSpec file, test listener on port 8080, Lambda BeforeAllowTraffic hook for smoke tests, automatic rollback alarm, and deployment notifications.' },
+      { name: 'Fargate Spot capacity providers', prompt: 'Write CloudFormation to configure ECS capacity providers: FARGATE_SPOT as 80%, FARGATE as 20% base, capacity provider strategy per service, and SIGTERM handler in the application for graceful shutdown.' },
+      { name: 'ECS Service Connect mesh', prompt: 'Write CloudFormation to enable ECS Service Connect: namespace, client alias definitions for service discovery, health check configuration, and CloudWatch metrics for inter-service traffic.' }
+    ]
+  },
+  eks: {
+    title: 'EKS Cluster',
+    actions: [
+      { name: 'Production EKS (Terraform)', prompt: 'Write a complete Terraform EKS module: cluster v1.29, managed node groups (on-demand m5.xlarge x3 + spot mix), OIDC provider, IRSA for add-ons, cluster autoscaler, AWS LBC, EBS CSI driver, aws-auth configmap, and all IAM roles.' },
+      { name: 'Karpenter node provisioner', prompt: 'Write Terraform and YAML manifests for Karpenter: EC2NodeClass for Amazon Linux 2023, NodePool with on-demand and spot, multi-instance-type selection, disruption budgets, consolidation policy, and EventBridge interruption handler.' },
+      { name: 'Pod security hardening', prompt: 'Write Kubernetes YAML for EKS security hardening: Pod Security Standards (restricted namespace labels), OPA Gatekeeper constraints (no privileged, no hostNetwork, required labels), Falco DaemonSet with CloudWatch log output, and NetworkPolicy for zero-trust namespaces.' },
+      { name: 'IRSA setup script', prompt: 'Write a bash script and Terraform to set up IRSA for multiple service accounts: create OIDC provider, IAM roles with trust policies for each service account, annotate the k8s service accounts, and verify with a test pod.' }
+    ]
+  },
+  rds: {
+    title: 'RDS / Aurora',
+    actions: [
+      { name: 'Aurora Serverless v2 (Terraform)', prompt: 'Write a Terraform Aurora Serverless v2 PostgreSQL module: cluster and instance, Multi-AZ writer+reader, parameter group, subnet group, security group, Secrets Manager with rotation Lambda, Performance Insights, Enhanced Monitoring every 1s, backup retention 35 days, deletion protection.' },
+      { name: 'RDS encryption migration', prompt: 'Write a complete runbook and bash script for RDS encryption migration: snapshot the unencrypted instance, copy snapshot with KMS key, restore to new encrypted instance, update application DNS via Route53, minimize downtime, and validate.' },
+      { name: 'Cross-region replica setup', prompt: 'Write CloudFormation to create an RDS cross-region read replica in us-west-2 for DR: source DB cluster in us-east-1, replica cluster, promotion Lambda for DR failover, Route53 failover records, and CloudWatch replication lag alarm.' },
+      { name: 'Secrets Manager rotation Lambda', prompt: 'Write a complete Secrets Manager rotation Lambda for RDS PostgreSQL: all 4 rotation steps (createSecret, setSecret, testSecret, finishSecret), using pg library, IAM policy, and CloudFormation setup with automatic rotation schedule.' }
+    ]
+  },
+  lambda: {
+    title: 'Lambda Serverless',
+    actions: [
+      { name: 'Lambda Powertools template', prompt: 'Write a production Lambda function with aws-lambda-powertools: structured JSON logging with correlation IDs, custom metrics, X-Ray segment annotations, parameter store config, error handling with typed exceptions, and SAM template with dead-letter queue and Lambda Insights.' },
+      { name: 'Step Functions workflow', prompt: 'Write AWS Step Functions ASL JSON for order processing: validate → charge → allocate → ship → notify. Include Retry with exponential backoff, Catch to error handler Lambda, Parallel for concurrent steps, Wait for callback token pattern, and CDK deployment.' },
+      { name: 'EventBridge integration', prompt: 'Write CDK TypeScript for event-driven architecture: EventBridge custom bus, rules with content-based filtering for 5 event types, Lambda targets with DLQ, SQS ordered queue integration, and CloudWatch dashboard for event metrics.' },
+      { name: 'Lambda cold start optimization', prompt: 'Write a guide and code examples for Lambda cold start reduction: provisioned concurrency with auto-scaling schedule (using Application Auto Scaling), Lambda SnapStart for Java, runtime initialization best practices, and cost comparison for each approach.' }
+    ]
+  },
+  s3: {
+    title: 'S3 & CloudFront',
+    actions: [
+      { name: 'Secure S3 baseline (CDK)', prompt: 'Write CDK Python for a secure S3 bucket: block all public access, AES-256 server-side encryption, versioning, access logging, intelligent tiering lifecycle, object lock in compliance mode, bucket policy requiring HTTPS, and EventBridge notifications for object events.' },
+      { name: 'CloudFront + S3 + WAF', prompt: 'Write Terraform for a CloudFront distribution with S3 origin: Origin Access Control, HTTPS only, custom error pages, price class, WAF WebACL with managed rules (CommonRuleSet, SQLiRuleSet, KnownBadInputs), ACM certificate in us-east-1, and Route53 record.' },
+      { name: 'S3 replication setup', prompt: 'Write boto3 and CloudFormation to configure S3 cross-region replication with: IAM role, replication rule for specific prefix, S3 Replication Time Control for 15-min SLA, bidirectional replication, and replication metrics alarm.' },
+      { name: 'S3 lifecycle optimizer', prompt: 'Write a Lambda function that analyzes S3 Storage Lens metrics, identifies buckets without lifecycle policies or with suboptimal storage classes, applies recommended lifecycle rules automatically, and sends a weekly savings report.' }
+    ]
+  },
+  iam: {
+    title: 'IAM & Access',
+    actions: [
+      { name: 'Developer role policy set', prompt: 'Write least-privilege IAM policies for 4 roles: 1) Junior Developer (dev account only, read-most, deploy Lambda), 2) Senior Developer (staging+dev, ECS deploy), 3) DevOps Engineer (all accounts, limited prod), 4) Auditor (read-only all services). Include permission boundaries.' },
+      { name: 'SCP guardrail library', prompt: 'Write 8 AWS Organizations SCPs: 1) Deny leaving org, 2) Deny disabling CloudTrail, 3) Restrict to allowed regions, 4) Require MFA for sensitive actions, 5) Deny root usage, 6) Require encryption tags on resources, 7) Deny public S3, 8) Deny unapproved instance types.' },
+      { name: 'Access key rotation automation', prompt: 'Write a Lambda function that: lists all IAM users with access keys older than 90 days, emails them a warning, automatically disables keys over 120 days, logs all actions to CloudTrail, and sends a weekly report. Include EventBridge schedule and IAM role.' },
+      { name: 'SAML SSO setup', prompt: 'Write CloudFormation and setup guide for IAM Identity Center (SSO) with Okta as IdP: SAML metadata configuration, permission sets for each role, account assignments, and CLI profile setup for developers using aws sso login.' }
+    ]
+  },
+  cw: {
+    title: 'CloudWatch',
+    actions: [
+      { name: 'Composite alarm dashboard', prompt: 'Write CloudFormation for a complete monitoring stack: individual alarms for EC2 CPU/status, RDS connections/latency, ALB 5xx/latency, Lambda errors/throttles, ECS task count. Composite alarm triggers only on multi-service degradation. SNS to PagerDuty and Slack.' },
+      { name: 'Custom metrics Lambda', prompt: 'Write a Lambda function that publishes custom business metrics to CloudWatch every minute: active users (from DynamoDB), orders per minute (from SQS), revenue (from RDS query), and API success rate. Include the CloudWatch dashboard JSON and CDK deployment.' },
+      { name: 'Log insights query library', prompt: 'Write 12 essential CloudWatch Logs Insights queries with explanations: Lambda errors with stack traces, slow API responses, failed logins, VPC flow log anomalies, ECS container crashes, ALB 5xx grouped by target, and CloudTrail root account activity.' },
+      { name: 'Anomaly detection alarms', prompt: 'Write CloudFormation for CloudWatch Anomaly Detection alarms on all critical metrics: EC2 CPU, RDS connections, Lambda duration and error rate, ALB request count. Use band-based anomaly detection instead of static thresholds. Include SNS.' }
+    ]
+  }
+};
+
+let currentIacService = 'ec2';
+let currentFormat = 'terraform';
+
+function iacSelect(svc) {
+  document.querySelectorAll('.svc-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('isvc-' + svc).classList.add('active');
+  currentIacService = svc;
+  renderIacActions();
+}
+
+function iacFormat(fmt) {
+  currentFormat = fmt;
+}
+
+function renderIacActions() {
+  const data = iacData[currentIacService];
+  const el = document.getElementById('iac-actions');
+  document.getElementById('iac-action-title').innerHTML = `${data.title}
+    <div style="display:flex;gap:.3rem;">
+      <span class="badge bg-o" style="cursor:pointer" onclick="iacFormat('cfn')">CFN</span>
+      <span class="badge bg-t" style="cursor:pointer" onclick="iacFormat('terraform')">TF</span>
+      <span class="badge bg-b" style="cursor:pointer" onclick="iacFormat('cdk')">CDK</span>
+      <span class="badge bg-p" style="cursor:pointer" onclick="iacFormat('pulumi')">Pulumi</span>
+    </div>`;
+  el.innerHTML = '<div class="act-list">' + data.actions.map(a =>
+    `<div class="act-btn" onclick="generateIaC('${a.prompt.replace(/'/g, "&#39;").replace(/"/g, "&quot;")}', '${a.name.replace(/'/g, "&#39;")}')">${a.name}</div>`
+  ).join('') + '</div>';
+}
+
+function generateIaC(prompt, name) {
+  const formatInstructions = {
+    cfn: 'Write this as a CloudFormation YAML template (AWSTemplateFormatVersion: "2010-09-09")',
+    terraform: 'Write this as Terraform HCL (.tf files)',
+    cdk: 'Write this using AWS CDK (Python or TypeScript, specify which)',
+    pulumi: 'Write this using Pulumi (Python)'
+  };
+  const fullPrompt = `${formatInstructions[currentFormat] || 'Write as Terraform HCL'}. ${prompt}. Include complete, production-ready code with comments, variables/parameters, and outputs.`;
+  document.getElementById('code-filename').textContent = `${name} · ${currentFormat.toUpperCase()}`;
+  document.getElementById('code-output').textContent = `Generating ${currentFormat.toUpperCase()} for: ${name}\n\nOpening in AI Assistant...`;
+  ai(fullPrompt);
+}
+
+function copyCode() {
+  const code = document.getElementById('code-output').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
+}
+
+// INIT
+iacSelect('ec2');
+
+// Animate cost bars on load
+setTimeout(() => {
+  document.querySelectorAll('.cbar-fill').forEach(bar => {
+    const w = bar.style.width;
+    bar.style.width = '0';
+    setTimeout(() => bar.style.width = w, 100);
+  });
+}, 300);
+</script>
+</body></html>
+<script>
+// ── GEMINI BACKEND CONNECTION ─────────────────────────────
+const BACKEND = 'https://nimbus-backend.onrender.com';
+
+async function callAI(prompt) {
+  try {
+    const res = await fetch(BACKEND + '/api/ai/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: prompt })
+    });
+    const data = await res.json();
+    clearTyping();
+    if (data.reply) {
+      let html = data.reply
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/```(\w+)?\n?([\s\S]*?)```/g,'<pre><code>$2</code></pre>')
+        .replace(/`([^`]+)`/g,'<code>$1</code>')
+        .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+        .replace(/\n/g,'<br>');
+      appendMsg('ai', html);
+    } else {
+      appendMsg('ai', '❌ Error: ' + (data.error || 'Unknown error from Gemini'));
+    }
+  } catch (err) {
+    clearTyping();
+    appendMsg('ai', '❌ Backend not connected. Open terminal and run: <code>node server.js</code>');
+  }
+}
+
+// Override sendChat to use backend
+const _origSendChat = window.sendChat;
+window.sendChat = async function() {
+  const inp = document.getElementById('chat-input');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  showPanel('ai');
+  appendMsg('user', text);
+  showTyping();
+  await callAI(`You are NimbusAI, expert AWS DevOps engineer. Give detailed answers with real code, CLI commands, CloudFormation YAML, Terraform HCL and best practices.\n\nQuestion: ${text}`);
+};
+
+// Wire Enter key
+const inp = document.getElementById('chat-input');
+if (inp) {
+  inp.onkeydown = function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { sendChat(); e.preventDefault(); }
+  };
+}
+
+// Load real AWS data on startup
+async function loadAWSData() {
+  try {
+    const data = await fetch(BACKEND + '/api/dashboard').then(r => r.json());
+    console.log('✅ AWS Connected:', data);
+    const vals = document.querySelectorAll('.stat-val');
+    if (data.ec2   && vals[0]) vals[0].textContent = data.ec2.running || 0;
+    if (data.cost  && vals[1]) vals[1].textContent = '$' + parseFloat(data.cost.monthly || 0).toLocaleString();
+    if (data.lambda && vals[5]) vals[5].textContent = data.lambda.total || 0;
+    if (data.s3    && vals[6]) vals[6].textContent = data.s3.total || 0;
+  } catch(e) {
+    console.log('Backend not connected — showing demo data');
+  }
+}
+loadAWSData();
+</script>
+<script>
+// ── AUTH GUARD ─────────────────────────────────────────
+(function() {
+  const token = localStorage.getItem('nimbus_token');
+  const user = JSON.parse(localStorage.getItem('nimbus_user') || '{}');
+
+  if (!token) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  // Add user info and logout button to topbar when DOM is ready
+  window.addEventListener('DOMContentLoaded', function() {
+    const topbar = document.querySelector('.topbar .tb-right');
+    if (topbar) {
+      // Add user badge
+      const userBadge = document.createElement('div');
+      userBadge.className = 'tb-badge tb-blue';
+      userBadge.innerHTML = '👤 ' + (user.name || user.username || 'User');
+      userBadge.style.cursor = 'pointer';
+      topbar.appendChild(userBadge);
+
+      // Add logout button
+      const logoutBtn = document.createElement('button');
+      logoutBtn.style.cssText = 'background:rgba(255,79,79,.1);border:1px solid rgba(255,79,79,.25);color:#ff6b6b;padding:3px 10px;border-radius:5px;font-size:.68rem;font-family:DM Mono,monospace;cursor:pointer;';
+      logoutBtn.textContent = 'Logout';
+      logoutBtn.onclick = logout;
+      topbar.appendChild(logoutBtn);
+    }
+  });
+})();
+
+function logout() {
+  localStorage.removeItem('nimbus_token');
+  localStorage.removeItem('nimbus_user');
+  window.location.href = 'login.html';
+}
+
+// Add Authorization header to all backend calls
+const _origFetch = window.fetch;
+window.fetch = function(url, opts = {}) {
+  const token = localStorage.getItem('nimbus_token');
+  if (token && typeof url === 'string' && url.includes('localhost:3001')) {
+    opts.headers = opts.headers || {};
+    opts.headers['Authorization'] = 'Bearer ' + token;
+  }
+  return _origFetch(url, opts);
+};
+</script>
