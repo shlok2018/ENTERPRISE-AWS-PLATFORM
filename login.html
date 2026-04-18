@@ -216,7 +216,7 @@ async function login() {
 
       // Redirect to dashboard after 1.5s
       setTimeout(() => {
-        window.location.href = 'https://nimbus-2eq5bl3vg-shlok2018s-projects.vercel.app/NimbusAI-COMPLETE.html';
+        window.location.href = '/NimbusAI-COMPLETE.html';
       }, 1500);
 
     } else {
@@ -242,7 +242,7 @@ async function login() {
       localStorage.setItem('nimbus_token', fakeToken);
       localStorage.setItem('nimbus_user', JSON.stringify(fakeUser));
       document.getElementById('success').classList.add('show');
-      setTimeout(() => { window.location.href = 'https://nimbus-2eq5bl3vg-shlok2018s-projects.vercel.app/NimbusAI-COMPLETE.html'; }, 1500);
+      setTimeout(() => { window.location.href = '/NimbusAI-COMPLETE.html'; }, 1500);
     } else {
       errorBox.textContent = 'Backend not connected. Use admin/admin123 or demo/demo123.';
       errorBox.classList.add('show');
@@ -263,7 +263,7 @@ window.addEventListener('DOMContentLoaded', () => {
     })
     .then(r => r.json())
     .then(data => {
-      if (data.valid) window.location.href = 'https://nimbus-2eq5bl3vg-shlok2018s-projects.vercel.app/NimbusAI-COMPLETE.html';
+      if (data.valid) window.location.href = '/NimbusAI-COMPLETE.html';
     })
     .catch(() => {});
   }
