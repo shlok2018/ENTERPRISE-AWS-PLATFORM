@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>NimbusAI — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#07080d;color:#dde3f0;font-family:'Outfit',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+
+/* BACKGROUND */
+.bg{position:fixed;inset:0;z-index:0;}
+.bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,140,66,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,140,66,.03) 1px,transparent 1px);background-size:40px 40px;}
+.bg-glow1{position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(255,140,66,.08) 0%,transparent 70%);top:-100px;right:-100px;animation:float1 8s ease-in-out infinite;}
+.bg-glow2{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,170,.06) 0%,transparent 70%);bottom:-100px;left:-100px;animation:float2 10s ease-in-out infinite;}
+@keyframes float1{0%,100%{transform:translate(0,0);}50%{transform:translate(-30px,30px);}}
+@keyframes float2{0%,100%{transform:translate(0,0);}50%{transform:translate(30px,-30px);}}
+
+/* CARD */
+.card{position:relative;z-index:1;width:100%;max-width:420px;padding:2.5rem;background:rgba(12,14,23,.9);border:1px solid rgba(255,140,66,.15);border-radius:16px;backdrop-filter:blur(20px);box-shadow:0 25px 80px rgba(0,0,0,.5);}
+
+/* LOGO */
+.logo-wrap{text-align:center;margin-bottom:2rem;}
+.logo-mark{width:52px;height:52px;background:linear-gradient(135deg,#ff8c42,#e6722a);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900;color:#000;margin-bottom:.8rem;box-shadow:0 8px 24px rgba(255,140,66,.3);}
+.logo-name{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;}
+.logo-name span{color:#ff8c42;}
+.logo-sub{font-size:.72rem;color:#4a5568;font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-top:.2rem;}
+
+/* FORM */
+.form-title{font-size:.8rem;font-weight:700;color:#7a8499;text-transform:uppercase;letter-spacing:.1em;margin-bottom:1.5rem;text-align:center;}
+.field{margin-bottom:1rem;}
+.field label{display:block;font-size:.75rem;font-weight:600;color:#7a8499;margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.06em;}
+.field input{width:100%;background:#0c0e17;border:1px solid #1a1f35;color:#dde3f0;padding:.7rem 1rem;font-family:'Outfit',sans-serif;font-size:.85rem;border-radius:9px;outline:none;transition:all .15s;}
+.field input:focus{border-color:rgba(255,140,66,.4);box-shadow:0 0 0 3px rgba(255,140,66,.08);}
+.field input::placeholder{color:#3d4560;}
+
+/* PASSWORD TOGGLE */
+.pass-wrap{position:relative;}
+.pass-wrap input{padding-right:2.5rem;}
+.pass-toggle{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:#4a5568;cursor:pointer;font-size:.85rem;padding:.2rem;}
+.pass-toggle:hover{color:#dde3f0;}
+
+/* REMEMBER */
+.remember{display:flex;align-items:center;gap:.5rem;margin-bottom:1.5rem;}
+.remember input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:#ff8c42;}
+.remember label{font-size:.75rem;color:#7a8499;cursor:pointer;}
+
+/* SUBMIT */
+.submit-btn{width:100%;padding:.8rem;background:linear-gradient(135deg,#ff8c42,#e6722a);border:none;border-radius:9px;color:#000;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.02em;}
+.submit-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(255,140,66,.35);}
+.submit-btn:active{transform:translateY(0);}
+.submit-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+/* ERROR */
+.error-box{background:rgba(255,79,79,.08);border:1px solid rgba(255,79,79,.25);border-radius:8px;padding:.7rem 1rem;font-size:.78rem;color:#ff6b6b;margin-bottom:1rem;display:none;}
+.error-box.show{display:block;}
+
+/* DEMO CREDENTIALS */
+.demo-creds{margin-top:1.5rem;padding:1rem;background:rgba(255,140,66,.05);border:1px solid rgba(255,140,66,.12);border-radius:9px;}
+.demo-title{font-size:.65rem;font-weight:700;color:#ff8c42;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem;}
+.demo-item{display:flex;justify-content:space-between;font-size:.72rem;color:#7a8499;font-family:'DM Mono',monospace;padding:.2rem 0;cursor:pointer;}
+.demo-item:hover{color:#dde3f0;}
+.demo-item span:last-child{color:#4a5568;}
+
+/* DIVIDER */
+.divider{display:flex;align-items:center;gap:.7rem;margin:1.2rem 0;}
+.divider hr{flex:1;border:none;border-top:1px solid #1a1f35;}
+.divider span{font-size:.68rem;color:#3d4560;}
+
+/* LOADING SPINNER */
+.spinner{display:none;width:16px;height:16px;border:2px solid rgba(0,0,0,.3);border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* FOOTER */
+.card-footer{text-align:center;margin-top:1.5rem;font-size:.7rem;color:#3d4560;}
+.card-footer a{color:#ff8c42;text-decoration:none;}
+
+/* SUCCESS STATE */
+.success-overlay{position:fixed;inset:0;background:rgba(7,8,13,.95);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .3s;}
+.success-overlay.show{opacity:1;pointer-events:all;}
+.success-content{text-align:center;}
+.success-icon{font-size:3rem;margin-bottom:1rem;animation:pop .4s cubic-bezier(.175,.885,.32,1.275);}
+.success-text{font-size:1.1rem;font-weight:700;color:#dde3f0;margin-bottom:.3rem;}
+.success-sub{font-size:.78rem;color:#7a8499;}
+@keyframes pop{0%{transform:scale(0);}100%{transform:scale(1);}}
+</style>
+</head>
+<body>
+
+<div class="bg">
+  <div class="bg-grid"></div>
+  <div class="bg-glow1"></div>
+  <div class="bg-glow2"></div>
+</div>
+
+<div class="success-overlay" id="success">
+  <div class="success-content">
+    <div class="success-icon">✅</div>
+    <div class="success-text">Authentication successful</div>
+    <div class="success-sub">Redirecting to NimbusAI...</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="logo-wrap">
+    <div class="logo-mark">N</div>
+    <div class="logo-name">Nimbus<span>AI</span></div>
+    <div class="logo-sub">Enterprise AWS Platform</div>
+  </div>
+
+  <div class="form-title">Sign in to your account</div>
+
+  <div class="error-box" id="error-box">
+    Invalid username or password. Please try again.
+  </div>
+
+  <div class="field">
+    <label>Username</label>
+    <input type="text" id="username" placeholder="Enter your username" autocomplete="username"/>
+  </div>
+
+  <div class="field">
+    <label>Password</label>
+    <div class="pass-wrap">
+      <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()"/>
+      <button class="pass-toggle" onclick="togglePass()" type="button" id="pass-icon">👁</button>
+    </div>
+  </div>
+
+  <div class="remember">
+    <input type="checkbox" id="remember"/>
+    <label for="remember">Keep me signed in for 8 hours</label>
+  </div>
+
+  <button class="submit-btn" id="login-btn" onclick="login()">
+    <span id="btn-text">Sign In →</span>
+    <div class="spinner" id="spinner"></div>
+  </button>
+
+  <div class="divider"><hr/><span>Demo Credentials</span><hr/></div>
+
+  <div class="demo-creds">
+    <div class="demo-title">Click to fill credentials</div>
+    <div class="demo-item" onclick="fillCreds('admin','admin123')">
+      <span>👑 admin</span><span>admin123</span>
+    </div>
+    <div class="demo-item" onclick="fillCreds('demo','demo123')">
+      <span>👤 demo</span><span>demo123</span>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    NimbusAI v2.0 · <a href="#">AWS Enterprise Platform</a>
+  </div>
+</div>
+
+<script>
+const BACKEND = 'https://nimbus-backend.onrender.com';
+
+function togglePass() {
+  const inp = document.getElementById('password');
+  const icon = document.getElementById('pass-icon');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    icon.textContent = '🙈';
+  } else {
+    inp.type = 'password';
+    icon.textContent = '👁';
+  }
+}
+
+function fillCreds(user, pass) {
+  document.getElementById('username').value = user;
+  document.getElementById('password').value = pass;
+  document.getElementById('password').focus();
+}
+
+async function login() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const errorBox = document.getElementById('error-box');
+  const btn = document.getElementById('login-btn');
+  const btnText = document.getElementById('btn-text');
+  const spinner = document.getElementById('spinner');
+
+  errorBox.classList.remove('show');
+
+  if (!username || !password) {
+    errorBox.textContent = 'Please enter both username and password.';
+    errorBox.classList.add('show');
+    return;
+  }
+
+  // Show loading
+  btn.disabled = true;
+  btnText.style.display = 'none';
+  spinner.style.display = 'block';
+
+  try {
+    const res = await fetch(BACKEND + '/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (data.success && data.token) {
+      // Save token
+      localStorage.setItem('nimbus_token', data.token);
+      localStorage.setItem('nimbus_user', JSON.stringify(data.user));
+
+      // Show success
+      document.getElementById('success').classList.add('show');
+
+      // Redirect to dashboard after 1.5s
+      setTimeout(() => {
+        window.location.href = 'NimbusAI-FINAL.html';
+      }, 1500);
+
+    } else {
+      errorBox.textContent = data.error || 'Invalid credentials. Try admin / admin123';
+      errorBox.classList.add('show');
+      btn.disabled = false;
+      btnText.style.display = 'block';
+      spinner.style.display = 'none';
+    }
+
+  } catch (err) {
+    // If backend not connected, use demo fallback
+    if (
+      (username === 'admin' && password === 'admin123') ||
+      (username === 'demo'  && password === 'demo123')
+    ) {
+      const fakeToken = 'demo-token-' + Date.now();
+      const fakeUser = {
+        username,
+        role: username === 'admin' ? 'admin' : 'viewer',
+        name: username === 'admin' ? 'AWS Admin' : 'Demo User'
+      };
+      localStorage.setItem('nimbus_token', fakeToken);
+      localStorage.setItem('nimbus_user', JSON.stringify(fakeUser));
+      document.getElementById('success').classList.add('show');
+      setTimeout(() => { window.location.href = 'NimbusAI-FINAL.html'; }, 1500);
+    } else {
+      errorBox.textContent = 'Backend not connected. Use admin/admin123 or demo/demo123.';
+      errorBox.classList.add('show');
+      btn.disabled = false;
+      btnText.style.display = 'block';
+      spinner.style.display = 'none';
+    }
+  }
+}
+
+// Check if already logged in
+window.addEventListener('DOMContentLoaded', () => {
+  const token = localStorage.getItem('nimbus_token');
+  if (token) {
+    // Verify token is still valid
+    fetch(BACKEND + '/api/auth/verify', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.valid) window.location.href = 'NimbusAI-FINAL.html';
+    })
+    .catch(() => {});
+  }
+  // Focus username field
+  document.getElementById('username').focus();
+});
+</script>
+</body>
+</html>
