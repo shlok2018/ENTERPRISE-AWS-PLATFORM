@@ -405,8 +405,6 @@ progress-ring{transform:rotate(-90deg);}
 <div class="sidebar">
   <div class="sb-section">Overview</div>
   <div class="ni active" id="nav-dashboard" onclick="showPanel('dashboard')"><span class="ico">⬛</span>Dashboard</div>
-    <div class="ni" id="nav-arch" onclick="window.open('architecture.html')"><span class="ico">🏗</span>Architecture<span class="nb nb-o">NEW</span></div>
-  <div class="ni" id="nav-ai" onclick="showPanel('ai')"><span class="ico">◈</span>AI Command Center<span class="nb nb-o">AI</span></div>
   <div class="ni" id="nav-alerts" onclick="showPanel('alerts')"><span class="ico">🔔</span>Alerts & Events<span class="nb nb-r">9</span></div>
 
   <div class="sb-section">Build & Deploy</div>
@@ -439,7 +437,6 @@ progress-ring{transform:rotate(-90deg);}
 
   <div class="sb-section">FinOps</div>
   <div class="ni" id="nav-finops" onclick="showPanel('finops')"><span class="ico">$</span>Cost Dashboard</div>
-    <div class="ni" id="nav-arch" onclick="window.open('architecture.html')"><span class="ico">🏗</span>Architecture<span class="nb nb-o">NEW</span></div>
   <div class="ni" id="nav-savings" onclick="showPanel('savings')"><span class="ico">◎</span>Savings Planner</div>
 
   <div class="sb-section">Observability</div>
@@ -454,6 +451,7 @@ progress-ring{transform:rotate(-90deg);}
 
   <div class="ni" id="nav-actions" onclick="showPanel('actions')"><span class="ico">⚡</span>Quick Actions<span class="nb nb-o">NEW</span></div>
     <div class="sb-section">Multi-Cloud</div>
+    <div class="ni" id="nav-arch" onclick="showPanel('arch')"><span class="ico">🏗</span>Architecture<span class="nb nb-o">NEW</span></div>
     <div class="ni" id="nav-multicloud" onclick="showPanel('multicloud')"><span class="ico">🌐</span>Multi-Cloud<span class="nb nb-o">NEW</span></div>
     <div class="ni" id="nav-azure" onclick="showPanel('azure')"><span class="ico">🔵</span>Azure</div>
     <div class="ni" id="nav-gcp" onclick="showPanel('gcp')"><span class="ico">🟢</span>Google Cloud</div>
@@ -753,7 +751,6 @@ progress-ring{transform:rotate(-90deg);}
 <div class="panel" id="panel-finops">
 <div class="scroll">
   <div class="ph"><div class="ph-left"><div class="ph-title">FinOps Cost Dashboard</div>
-    <div class="ni" id="nav-arch" onclick="window.open('architecture.html')"><span class="ico">🏗</span>Architecture<span class="nb nb-o">NEW</span></div><div class="ph-sub">AI-powered cost optimization — $2,840 in savings identified</div></div>
   <div class="ph-actions"><button class="btn btn-ghost btn-sm" onclick="ai('I am spending $8,412/month on AWS. Do a comprehensive FinOps analysis: identify top 10 cost optimizations, ROI for each, implementation effort, and a 90-day savings roadmap to get my bill under $5,500.')">Full FinOps Audit ↗</button><button class="btn btn-primary btn-sm">Export Report</button></div></div>
   <div class="stats-grid stats-4">
     <div class="stat stat-r"><div class="stat-label">Current Spend</div><div class="stat-val s-r">$8,412</div><div class="stat-sub stat-dn">▲ 18% over budget</div></div>
@@ -1418,6 +1415,139 @@ window.showPanel = function(id) {
 loadMultiCloud();
 </script>
 </div><!-- end content -->
+<div class="panel" id="panel-arch">
+<div class="scroll">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">🏗 Architecture Diagram</div>
+      <div class="ph-sub">Live AWS infrastructure map — auto-updates every 60 seconds</div>
+    </div>
+    <div class="ph-actions">
+      <button class="btn btn-ghost btn-sm" onclick="loadArchDiagram()">↺ Refresh</button>
+      <button class="btn btn-primary btn-sm" onclick="runAutopilotScan()">🤖 Run AutoPilot</button>
+    </div>
+  </div>
+  <div class="stats-grid stats-6" style="margin-bottom:1rem;">
+    <div class="stat stat-o"><div class="stat-label">EC2</div><div class="stat-val s-o" id="arch-ec2">—</div></div>
+    <div class="stat stat-t"><div class="stat-label">S3</div><div class="stat-val s-t" id="arch-s3">—</div></div>
+    <div class="stat stat-b"><div class="stat-label">Lambda</div><div class="stat-val s-b" id="arch-lambda">—</div></div>
+    <div class="stat stat-p"><div class="stat-label">RDS</div><div class="stat-val s-p" id="arch-rds">—</div></div>
+    <div class="stat stat-r"><div class="stat-label">Alarms</div><div class="stat-val s-r" id="arch-alarms">—</div></div>
+    <div class="stat stat-g"><div class="stat-label">AutoPilot</div><div class="stat-val s-g" id="arch-autopilot">—</div></div>
+  </div>
+  <div class="card" style="overflow:auto;">
+    <div id="arch-loading" style="padding:3rem;text-align:center;color:#4a5568;">
+      <div style="font-size:2rem;margin-bottom:.5rem;">🔍</div>
+      Scanning your AWS infrastructure...
+    </div>
+    <div id="arch-canvas" style="min-width:900px;padding:1.5rem;display:none;">
+      <div style="text-align:center;margin-bottom:1.5rem;">
+        <div style="font-size:.65rem;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.8rem;">Internet Layer</div>
+        <div style="display:flex;justify-content:center;gap:1.5rem;">
+          <div class="arch-node" onclick="archDetail('Users','Internet Traffic','Global users')"><span style="font-size:1.4rem;">👥</span><div class="an-name">Users</div><div class="an-sub">Internet</div></div>
+          <div class="arch-node" onclick="archDetail('CloudFront','CDN','Global content delivery')"><span style="font-size:1.4rem;">⚡</span><div class="an-name">CloudFront</div><div class="an-sub">CDN</div></div>
+          <div class="arch-node" onclick="archDetail('S3','Object Storage','Static files and backups')"><span style="font-size:1.4rem;">🪣</span><div class="an-name">S3</div><div class="an-sub" id="arch-s3-sub">loading...</div></div>
+          <div class="arch-node" onclick="archDetail('Route 53','DNS','Domain name resolution')"><span style="font-size:1.4rem;">🌐</span><div class="an-name">Route 53</div><div class="an-sub">DNS</div></div>
+        </div>
+      </div>
+      <div style="text-align:center;color:#1a1f35;font-size:1.2rem;margin:.5rem 0;">↕</div>
+      <div style="border:1px solid rgba(79,156,249,.2);border-radius:12px;padding:1.2rem;background:rgba(79,156,249,.02);position:relative;margin-bottom:1rem;">
+        <div style="position:absolute;top:-10px;left:16px;background:#0c0e17;padding:0 6px;font-size:.65rem;font-weight:700;color:#4f9cf9;font-family:monospace;">🔒 VPC</div>
+        <div style="border:1px dashed rgba(0,212,170,.2);border-radius:8px;padding:1rem;margin-bottom:.8rem;">
+          <div style="font-size:.6rem;font-weight:700;color:#00d4aa;text-transform:uppercase;margin-bottom:.8rem;">Public Subnet</div>
+          <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+            <div class="arch-node" onclick="archDetail('Internet Gateway','Network Gateway','Connects VPC to internet')"><span style="font-size:1.4rem;">🌐</span><div class="an-name">IGW</div><div class="an-sub">Gateway</div></div>
+            <div class="arch-node" onclick="archDetail('Load Balancer','ALB','Distributes traffic')"><span style="font-size:1.4rem;">⚖️</span><div class="an-name">ALB</div><div class="an-sub">Load Balancer</div></div>
+            <div class="arch-node" onclick="archDetail('NAT Gateway','Network','Private subnet internet')"><span style="font-size:1.4rem;">🔀</span><div class="an-name">NAT</div><div class="an-sub">Gateway</div></div>
+          </div>
+        </div>
+        <div style="border:1px dashed rgba(255,140,66,.2);border-radius:8px;padding:1rem;margin-bottom:.8rem;">
+          <div style="font-size:.6rem;font-weight:700;color:#ff8c42;text-transform:uppercase;margin-bottom:.8rem;">Private Subnet — Compute</div>
+          <div id="arch-ec2-nodes" style="display:flex;gap:1rem;flex-wrap:wrap;"><div class="arch-node" style="opacity:.4;"><span style="font-size:1.4rem;">🖥</span><div class="an-name">Loading...</div></div></div>
+        </div>
+        <div style="border:1px dashed rgba(168,85,247,.2);border-radius:8px;padding:1rem;">
+          <div style="font-size:.6rem;font-weight:700;color:#a855f7;text-transform:uppercase;margin-bottom:.8rem;">Data Subnet — Databases</div>
+          <div id="arch-rds-nodes" style="display:flex;gap:1rem;flex-wrap:wrap;"><div class="arch-node" style="opacity:.4;"><span style="font-size:1.4rem;">🗄</span><div class="an-name">Loading...</div></div></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.65rem;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.8rem;">Managed Services</div>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+          <div class="arch-node" onclick="archDetail('CloudWatch','Monitoring','Metrics and alarms')"><span style="font-size:1.4rem;">📊</span><div class="an-name">CloudWatch</div><div class="an-sub" id="arch-cw-sub">loading...</div></div>
+          <div class="arch-node" onclick="archDetail('IAM','Security','Access management')"><span style="font-size:1.4rem;">🔑</span><div class="an-name">IAM</div><div class="an-sub">Security</div></div>
+          <div class="arch-node" onclick="archDetail('Lambda','Serverless','Event-driven functions')"><span style="font-size:1.4rem;">⚡</span><div class="an-name">Lambda</div><div class="an-sub" id="arch-lambda-sub">loading...</div></div>
+          <div class="arch-node" onclick="archDetail('SNS','Notifications','Push alerts')"><span style="font-size:1.4rem;">🔔</span><div class="an-name">SNS</div><div class="an-sub">Alerts</div></div>
+          <div class="arch-node" onclick="archDetail('SQS','Queue','Message queuing')"><span style="font-size:1.4rem;">📬</span><div class="an-name">SQS</div><div class="an-sub">Queue</div></div>
+          <div class="arch-node" onclick="archDetail('CloudFormation','IaC','Infrastructure as code')"><span style="font-size:1.4rem;">📋</span><div class="an-name">CloudFormation</div><div class="an-sub">IaC</div></div>
+          <div class="arch-node" style="border-color:rgba(0,212,170,.3);" onclick="archDetail('NimbusAI AutoPilot','AI Agent','Autonomous monitoring')"><span style="font-size:1.4rem;">🤖</span><div class="an-name">AutoPilot</div><div class="an-sub" style="color:#00d4aa;" id="arch-autopilot-sub">● Active</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="arch-detail" style="display:none;margin-top:.8rem;" class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;">
+      <div class="card-title" id="arch-detail-title">Details</div>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('arch-detail').style.display='none'">✕</button>
+    </div>
+    <div id="arch-detail-content"></div>
+  </div>
+</div>
+</div>
+<style>
+.arch-node{display:inline-flex;flex-direction:column;align-items:center;background:#0c0e17;border:1px solid #1a1f35;border-radius:10px;padding:10px 14px;min-width:80px;cursor:pointer;transition:all .2s;}
+.arch-node:hover{transform:translateY(-2px);border-color:#ff8c42;box-shadow:0 4px 16px rgba(255,140,66,.15);}
+.an-name{font-size:.7rem;font-weight:700;color:#dde3f0;text-align:center;margin-top:4px;}
+.an-sub{font-size:.6rem;color:#4a5568;text-align:center;margin-top:2px;}
+</style>
+<script>
+async function loadArchDiagram() {
+  const BACKEND = 'http://localhost:3001';
+  document.getElementById('arch-loading').style.display = 'block';
+  document.getElementById('arch-canvas').style.display = 'none';
+  try {
+    const [ec2,s3,lambda,rds,alarms,autopilot] = await Promise.all([
+      fetch(BACKEND+'/api/ec2/instances').then(r=>r.json()).catch(()=>({instances:[]})),
+      fetch(BACKEND+'/api/s3/buckets').then(r=>r.json()).catch(()=>({buckets:[]})),
+      fetch(BACKEND+'/api/lambda/functions').then(r=>r.json()).catch(()=>({functions:[]})),
+      fetch(BACKEND+'/api/rds/instances').then(r=>r.json()).catch(()=>({instances:[]})),
+      fetch(BACKEND+'/api/cloudwatch/alarms').then(r=>r.json()).catch(()=>({alarms:[]})),
+      fetch(BACKEND+'/api/autopilot/status').then(r=>r.json()).catch(()=>null)
+    ]);
+    document.getElementById('arch-ec2').textContent = ec2.instances?.filter(i=>i.state==='running').length||0;
+    document.getElementById('arch-s3').textContent = s3.buckets?.length||0;
+    document.getElementById('arch-lambda').textContent = lambda.functions?.length||0;
+    document.getElementById('arch-rds').textContent = rds.instances?.length||0;
+    document.getElementById('arch-alarms').textContent = alarms.alarms?.filter(a=>a.state==='ALARM').length||0;
+    document.getElementById('arch-autopilot').textContent = autopilot?.latestStatus||'—';
+    document.getElementById('arch-s3-sub').textContent = (s3.buckets?.length||0)+' buckets';
+    document.getElementById('arch-lambda-sub').textContent = (lambda.functions?.length||0)+' functions';
+    document.getElementById('arch-cw-sub').textContent = (alarms.alarms?.length||0)+' alarms';
+    const ec2c = document.getElementById('arch-ec2-nodes');
+    ec2c.innerHTML = ec2.instances?.length>0 ? ec2.instances.slice(0,6).map(i=>`<div class="arch-node" onclick="archDetail('${i.name}','EC2 ${i.type}','State: ${i.state}')"><span style="font-size:1.4rem;">🖥</span><div class="an-name">${i.name.length>10?i.name.slice(0,10)+'...':i.name}</div><div class="an-sub" style="color:${i.state==='running'?'#00d4aa':'#ff4f4f'};">● ${i.state}</div></div>`).join('') : '<div class="arch-node" style="opacity:.4;"><span style="font-size:1.4rem;">🖥</span><div class="an-name">No EC2</div></div>';
+    const rdsc = document.getElementById('arch-rds-nodes');
+    rdsc.innerHTML = rds.instances?.length>0 ? rds.instances.slice(0,4).map(d=>`<div class="arch-node" onclick="archDetail('${d.id}','RDS ${d.engine}','Class: ${d.class}')"><span style="font-size:1.4rem;">🗄</span><div class="an-name">${d.id.length>10?d.id.slice(0,10)+'...':d.id}</div><div class="an-sub">${d.engine}</div></div>`).join('') : '<div class="arch-node" style="opacity:.4;"><span style="font-size:1.4rem;">🗄</span><div class="an-name">No RDS</div></div>';
+    if(autopilot){const c=autopilot.latestStatus==='HEALTHY'?'#00d4aa':'#ff8c42';document.getElementById('arch-autopilot-sub').style.color=c;document.getElementById('arch-autopilot-sub').textContent='● '+(autopilot.latestStatus||'Active');}
+    document.getElementById('arch-loading').style.display='none';
+    document.getElementById('arch-canvas').style.display='block';
+  } catch(e) {
+    document.getElementById('arch-loading').innerHTML='<div style="color:#ff4f4f;">❌ Backend not connected</div>';
+  }
+}
+function archDetail(name,type,desc) {
+  document.getElementById('arch-detail-title').textContent=name;
+  document.getElementById('arch-detail-content').innerHTML=`<div style="display:flex;flex-direction:column;gap:.5rem;"><div style="display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid #1a1f35;"><span style="font-size:.72rem;color:#4a5568;">Type</span><span style="font-size:.72rem;color:#dde3f0;font-family:monospace;">${type}</span></div><div style="padding:.4rem 0;"><span style="font-size:.72rem;color:#7a8499;">${desc}</span></div></div>`;
+  document.getElementById('arch-detail').style.display='block';
+}
+async function runAutopilotScan() {
+  try {
+    const res=await fetch('http://localhost:3001/api/autopilot/run',{method:'POST'});
+    const data=await res.json();
+    if(data.success){alert('✅ AutoPilot scan complete!\nStatus: '+data.result.status+'\nIssues: '+data.result.issuesFound+'\nFixed: '+data.result.actionsFixed);loadArchDiagram();}
+  } catch(e){alert('❌ Backend not connected');}
+}
+const _origShowPanelArch=window.showPanel;
+window.showPanel=function(id){_origShowPanelArch(id);if(id==='arch')loadArchDiagram();};
+</script>
 </div><!-- end app -->
 <script>
 // PANEL NAVIGATION
