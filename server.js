@@ -775,42 +775,44 @@ async function runAutopilot() {
       } catch (e) {}
     })(),
 
-    // ── CHECK 5: Cost Anomaly ───────────────────────────
-    (async () => {
-      try {
-        const today = new Date().toISOString().split('T')[0];
-        const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-        const twoDaysAgo = new Date(Date.now() - 172800000).toISOString().split('T')[0];
+/* DISABLED - saves Cost Explorer credits
+// ── CHECK 5: Cost Anomaly ───────────────────────────────
+(async () => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    const twoDaysAgo = new Date(Date.now() - 172800000).toISOString().split('T')[0];
 
-        const [todayCost, yesterdayCost] = await Promise.all([
-          ce.send(new GetCostAndUsageCommand({
-            TimePeriod: { Start: yesterday, End: today },
-            Granularity: 'DAILY',
-            Metrics: ['UnblendedCost']
-          })),
-          ce.send(new GetCostAndUsageCommand({
-            TimePeriod: { Start: twoDaysAgo, End: yesterday },
-            Granularity: 'DAILY',
-            Metrics: ['UnblendedCost']
-          }))
-        ]);
+    const [todayCost, yesterdayCost] = await Promise.all([
+      ce.send(new GetCostAndUsageCommand({
+        TimePeriod: { Start: yesterday, End: today },
+        Granularity: 'DAILY',
+        Metrics: ['UnblendedCost']
+      })),
+      ce.send(new GetCostAndUsageCommand({
+        TimePeriod: { Start: twoDaysAgo, End: yesterday },
+        Granularity: 'DAILY',
+        Metrics: ['UnblendedCost']
+      }))
+    ]);
 
-        const todayAmount = parseFloat(todayCost.ResultsByTime?.[0]?.Total?.UnblendedCost?.Amount || 0);
-        const yesterdayAmount = parseFloat(yesterdayCost.ResultsByTime?.[0]?.Total?.UnblendedCost?.Amount || 0);
+    const todayAmount = parseFloat(todayCost.ResultsByTime?.[0]?.Total?.UnblendedCost?.Amount || 0);
+    const yesterdayAmount = parseFloat(yesterdayCost.ResultsByTime?.[0]?.Total?.UnblendedCost?.Amount || 0);
 
-        if (yesterdayAmount > 0) {
-          const increase = ((todayAmount - yesterdayAmount) / yesterdayAmount) * 100;
-          if (increase > 20) {
-            issues.push({
-              type: 'COST',
-              severity: 'HIGH',
-              resource: 'AWS Account',
-              issue: `Cost spike detected! ${increase.toFixed(0)}% increase vs yesterday ($${yesterdayAmount.toFixed(2)} → $${todayAmount.toFixed(2)})`
-            });
-          }
-        }
-      } catch (e) {}
-    })()
+    if (yesterdayAmount > 0) {
+      const increase = ((todayAmount - yesterdayAmount) / yesterdayAmount) * 100;
+      if (increase > 20) {
+        issues.push({
+          type: 'COST',
+          severity: 'HIGH',
+          resource: 'AWS Account',
+          issue: `Cost spike detected! ${increase.toFixed(0)}% increase`
+        });
+      }
+    }
+  } catch (e) {}
+})(),
+*/
 
   ]);
 
@@ -863,7 +865,7 @@ app.get('/api/autopilot/log', async (req, res) => {
 setTimeout(async () => {
   console.log('[AutoPilot] 🚀 Starting autonomous monitoring...');
   await runAutopilot(); // Run immediately on start
-  setInterval(runAutopilot, 5 * 60 * 1000); // Then every 5 minutes
+  setInterval(runAutopilot, 30 * 60 * 1000); // every 30 min - saves API costs
 }, 10000); // Wait 10 seconds after server start
 app.listen(PORT, () => {
   console.log('');
