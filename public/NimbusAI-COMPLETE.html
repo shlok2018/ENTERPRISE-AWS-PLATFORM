@@ -405,6 +405,7 @@ progress-ring{transform:rotate(-90deg);}
 <div class="sidebar">
   <div class="sb-section">Overview</div>
   <div class="ni active" id="nav-dashboard" onclick="showPanel('dashboard')"><span class="ico">⬛</span>Dashboard</div>
+  <div class="ni" id="nav-arch" onclick="showPanel('arch')" style="border-left:2px solid #ff8c42;"><span class="ico">🏗</span>Architecture<span class="nb nb-o">NEW</span></div>
   <div class="ni" id="nav-alerts" onclick="showPanel('alerts')"><span class="ico">🔔</span>Alerts & Events<span class="nb nb-r">9</span></div>
 
   <div class="sb-section">Build & Deploy</div>
@@ -451,7 +452,6 @@ progress-ring{transform:rotate(-90deg);}
 
   <div class="ni" id="nav-actions" onclick="showPanel('actions')"><span class="ico">⚡</span>Quick Actions<span class="nb nb-o">NEW</span></div>
     <div class="sb-section">Multi-Cloud</div>
-    <div class="ni" id="nav-arch" onclick="showPanel('arch')"><span class="ico">🏗</span>Architecture<span class="nb nb-o">NEW</span></div>
     <div class="ni" id="nav-multicloud" onclick="showPanel('multicloud')"><span class="ico">🌐</span>Multi-Cloud<span class="nb nb-o">NEW</span></div>
     <div class="ni" id="nav-azure" onclick="showPanel('azure')"><span class="ico">🔵</span>Azure</div>
     <div class="ni" id="nav-gcp" onclick="showPanel('gcp')"><span class="ico">🟢</span>Google Cloud</div>
@@ -1557,7 +1557,7 @@ function showPanel(id) {
   const nav = document.getElementById('nav-' + id);
   if (panel) panel.classList.add('active');
   if (nav) nav.classList.add('active');
-  if (id === 'ai') setTimeout(() => document.getElementById('chat-input')?.focus(), 100);
+  if (id === 'arch') { var ap = document.getElementById('panel-arch'); if(ap){ document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active')); ap.classList.add('active'); setTimeout(function(){if(typeof loadArchDiagram==='function')loadArchDiagram();},200); return; } } if (id === 'ai') setTimeout(() => document.getElementById('chat-input')?.focus(), 100);
   if (id === 'arch') { setTimeout(() => { if(typeof loadArchDiagram === 'function') loadArchDiagram(); }, 100); }
 }
 
