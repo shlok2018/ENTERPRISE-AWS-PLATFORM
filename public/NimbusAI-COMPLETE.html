@@ -1414,7 +1414,6 @@ window.showPanel = function(id) {
 // Load on startup
 loadMultiCloud();
 </script>
-</div><!-- end content -->
 <div class="panel" id="panel-arch">
 <div class="scroll">
   <div class="ph">
@@ -1548,7 +1547,7 @@ async function runAutopilotScan() {
 const _origShowPanelArch=window.showPanel;
 window.showPanel=function(id){_origShowPanelArch(id);if(id==='arch')loadArchDiagram();};
 </script>
-</div><!-- end app -->
+</div><!-- end content -->
 <script>
 // PANEL NAVIGATION
 function showPanel(id) {
@@ -1559,6 +1558,7 @@ function showPanel(id) {
   if (panel) panel.classList.add('active');
   if (nav) nav.classList.add('active');
   if (id === 'ai') setTimeout(() => document.getElementById('chat-input')?.focus(), 100);
+  if (id === 'arch') { setTimeout(() => { if(typeof loadArchDiagram === 'function') loadArchDiagram(); }, 100); }
 }
 
 // AI CHAT
