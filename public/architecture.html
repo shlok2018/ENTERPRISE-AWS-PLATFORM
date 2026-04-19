@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>NimbusAI — Architecture Diagram</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#07080d;color:#dde3f0;font-family:'Outfit',sans-serif;min-height:100vh;}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:.7rem 1.5rem;background:#0c0e17;border-bottom:1px solid #1a1f35;position:sticky;top:0;z-index:100;}
+.tb-logo{font-size:1.1rem;font-weight:800;letter-spacing:-.03em;}
+.tb-logo span{color:#ff8c42;}
+.tb-actions{display:flex;gap:.5rem;align-items:center;}
+.btn{padding:.4rem .9rem;border-radius:7px;font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer;border:none;transition:all .15s;}
+.btn-primary{background:linear-gradient(135deg,#ff8c42,#e6722a);color:#000;}
+.btn-ghost{background:transparent;border:1px solid #1a1f35;color:#7a8499;}
+.btn-ghost:hover{border-color:#ff8c42;color:#ff8c42;}
+.badge{padding:.2rem .6rem;border-radius:20px;font-size:.65rem;font-weight:700;}
+.badge-g{background:rgba(0,212,170,.1);color:#00d4aa;border:1px solid rgba(0,212,170,.2);}
+.badge-r{background:rgba(255,79,79,.1);color:#ff4f4f;border:1px solid rgba(255,79,79,.2);}
+
+/* MAIN LAYOUT */
+.main{display:grid;grid-template-columns:280px 1fr;height:calc(100vh - 49px);}
+
+/* SIDEBAR */
+.sidebar{background:#0c0e17;border-right:1px solid #1a1f35;padding:1rem;overflow-y:auto;}
+.sb-title{font-size:.7rem;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.8rem;}
+.resource-item{display:flex;align-items:center;gap:.6rem;padding:.5rem .7rem;border-radius:7px;cursor:pointer;transition:all .15s;margin-bottom:.2rem;}
+.resource-item:hover{background:#1a1f35;}
+.resource-item.selected{background:rgba(255,140,66,.08);border:1px solid rgba(255,140,66,.2);}
+.ri-icon{font-size:1.1rem;width:24px;text-align:center;}
+.ri-info{flex:1;}
+.ri-name{font-size:.78rem;font-weight:600;color:#dde3f0;}
+.ri-sub{font-size:.65rem;color:#4a5568;}
+.ri-count{font-size:.7rem;font-weight:700;color:#ff8c42;}
+
+/* CANVAS AREA */
+.canvas-area{position:relative;overflow:auto;background:#07080d;background-image:radial-gradient(circle,#1a1f35 1px,transparent 1px);background-size:30px 30px;}
+
+/* DIAGRAM */
+.diagram{position:relative;min-width:1200px;min-height:800px;padding:40px;}
+
+/* REGION BOX */
+.region-box{border:2px dashed #1a1f35;border-radius:16px;padding:20px;position:relative;background:rgba(12,14,23,.5);}
+.region-label{position:absolute;top:-12px;left:20px;background:#07080d;padding:0 8px;font-size:.7rem;font-weight:700;color:#4a5568;font-family:'DM Mono',monospace;}
+
+/* VPC BOX */
+.vpc-box{border:1px solid rgba(79,156,249,.2);border-radius:12px;padding:16px;background:rgba(79,156,249,.03);position:relative;margin:12px 0;}
+.vpc-label{position:absolute;top:-10px;left:16px;background:#07080d;padding:0 6px;font-size:.65rem;font-weight:700;color:#4f9cf9;font-family:'DM Mono',monospace;}
+
+/* SERVICE NODES */
+.node{display:inline-flex;flex-direction:column;align-items:center;background:#0c0e17;border:1px solid #1a1f35;border-radius:12px;padding:12px 16px;min-width:90px;cursor:pointer;transition:all .2s;position:relative;}
+.node:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4);}
+.node.selected{border-color:#ff8c42;box-shadow:0 0 0 2px rgba(255,140,66,.2);}
+.node-icon{font-size:1.5rem;margin-bottom:6px;}
+.node-name{font-size:.7rem;font-weight:700;color:#dde3f0;text-align:center;}
+.node-sub{font-size:.6rem;color:#4a5568;text-align:center;margin-top:2px;}
+.node-count{position:absolute;top:-8px;right:-8px;background:#ff8c42;color:#000;border-radius:10px;padding:1px 6px;font-size:.6rem;font-weight:800;}
+
+/* SERVICE ROWS */
+.service-row{display:flex;gap:16px;align-items:center;flex-wrap:wrap;padding:8px 0;}
+.section-label{font-size:.65rem;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;font-family:'DM Mono',monospace;}
+
+/* ARROWS */
+.arrow-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;}
+
+/* DETAIL PANEL */
+.detail-panel{position:fixed;right:20px;top:70px;width:300px;background:#0c0e17;border:1px solid #1a1f35;border-radius:12px;padding:1.2rem;z-index:50;display:none;}
+.detail-panel.show{display:block;}
+.dp-title{font-size:.9rem;font-weight:700;color:#dde3f0;margin-bottom:.8rem;}
+.dp-item{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid #1a1f35;}
+.dp-label{font-size:.72rem;color:#4a5568;}
+.dp-value{font-size:.72rem;color:#dde3f0;font-family:'DM Mono',monospace;}
+
+/* LEGEND */
+.legend{position:fixed;bottom:20px;left:300px;display:flex;gap:.8rem;background:#0c0e17;border:1px solid #1a1f35;border-radius:8px;padding:.6rem 1rem;}
+.legend-item{display:flex;align-items:center;gap:.4rem;font-size:.68rem;color:#4a5568;}
+.legend-dot{width:8px;height:8px;border-radius:50%;}
+
+/* LOADING */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:400px;gap:1rem;}
+.spinner{width:32px;height:32px;border:3px solid #1a1f35;border-top-color:#ff8c42;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* STATS BAR */
+.stats-bar{display:flex;gap:1.5rem;padding:.6rem 1.5rem;background:#0c0e17;border-bottom:1px solid #1a1f35;}
+.stat-item{display:flex;align-items:center;gap:.4rem;}
+.stat-dot{width:6px;height:6px;border-radius:50%;}
+.stat-text{font-size:.72rem;color:#7a8499;}
+.stat-val{font-size:.72rem;font-weight:700;color:#dde3f0;}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="tb-logo">Nimbus<span>AI</span> — Architecture Diagram</div>
+  <div class="tb-actions">
+    <span class="badge badge-g" id="status-badge">● Loading...</span>
+    <button class="btn btn-ghost" onclick="loadDiagram()">↺ Refresh</button>
+    <button class="btn btn-primary" onclick="exportDiagram()">⬇ Export PNG</button>
+    <button class="btn btn-ghost" onclick="window.history.back()">← Back</button>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-dot" style="background:#ff8c42"></div><span class="stat-text">EC2:</span><span class="stat-val" id="stat-ec2">—</span></div>
+  <div class="stat-item"><div class="stat-dot" style="background:#00d4aa"></div><span class="stat-text">S3:</span><span class="stat-val" id="stat-s3">—</span></div>
+  <div class="stat-item"><div class="stat-dot" style="background:#4f9cf9"></div><span class="stat-text">Lambda:</span><span class="stat-val" id="stat-lambda">—</span></div>
+  <div class="stat-item"><div class="stat-dot" style="background:#a855f7"></div><span class="stat-text">RDS:</span><span class="stat-val" id="stat-rds">—</span></div>
+  <div class="stat-item"><div class="stat-dot" style="background:#f59e0b"></div><span class="stat-text">Alarms:</span><span class="stat-val" id="stat-alarms">—</span></div>
+  <div class="stat-item"><div class="stat-dot" style="background:#10b981"></div><span class="stat-text">Cost:</span><span class="stat-val" id="stat-cost">—</span></div>
+  <div class="stat-item" style="margin-left:auto;"><span class="stat-text">Region:</span><span class="stat-val" id="stat-region">us-east-1</span></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-title">Resources</div>
+    <div id="sidebar-resources">
+      <div style="color:#4a5568;font-size:.75rem;padding:.5rem;">Loading resources...</div>
+    </div>
+
+    <div class="sb-title" style="margin-top:1.2rem;">AutoPilot Status</div>
+    <div id="autopilot-status" style="background:#1a1f35;border-radius:8px;padding:.8rem;font-size:.72rem;">
+      <div style="color:#4a5568;">Loading...</div>
+    </div>
+
+    <div class="sb-title" style="margin-top:1.2rem;">Quick Actions</div>
+    <div style="display:flex;flex-direction:column;gap:.4rem;">
+      <button class="btn btn-ghost" style="width:100%;text-align:left;" onclick="window.location.href='NimbusAI-COMPLETE.html'">← Back to Dashboard</button>
+      <button class="btn btn-ghost" style="width:100%;text-align:left;" onclick="runAutopilot()">🤖 Run AutoPilot Scan</button>
+      <button class="btn btn-ghost" style="width:100%;text-align:left;" onclick="loadDiagram()">↺ Refresh Diagram</button>
+    </div>
+  </div>
+
+  <!-- CANVAS -->
+  <div class="canvas-area" id="canvas">
+    <div class="diagram" id="diagram">
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div style="color:#4a5568;font-size:.85rem;">Scanning your AWS infrastructure...</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- DETAIL PANEL -->
+<div class="detail-panel" id="detail-panel">
+  <div class="dp-title" id="dp-title">Resource Details</div>
+  <div id="dp-content"></div>
+  <button class="btn btn-ghost" style="width:100%;margin-top:.8rem;" onclick="closeDetail()">Close</button>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#ff8c42"></div>Compute</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#00d4aa"></div>Storage</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#4f9cf9"></div>Network</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#a855f7"></div>Database</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Serverless</div>
+</div>
+
+<script>
+const BACKEND = 'http://localhost:3001';
+let awsData = {};
+
+async function loadDiagram() {
+  document.getElementById('loading').style.display = 'flex';
+  document.getElementById('status-badge').textContent = '● Loading...';
+  document.getElementById('status-badge').className = 'badge badge-r';
+
+  try {
+    // Fetch all data in parallel
+    const [dashboard, ec2, s3, lambda, rds, alarms, autopilot] = await Promise.all([
+      fetch(`${BACKEND}/api/dashboard`).then(r => r.json()).catch(() => ({})),
+      fetch(`${BACKEND}/api/ec2/instances`).then(r => r.json()).catch(() => ({ instances: [] })),
+      fetch(`${BACKEND}/api/s3/buckets`).then(r => r.json()).catch(() => ({ buckets: [] })),
+      fetch(`${BACKEND}/api/lambda/functions`).then(r => r.json()).catch(() => ({ functions: [] })),
+      fetch(`${BACKEND}/api/rds/instances`).then(r => r.json()).catch(() => ({ instances: [] })),
+      fetch(`${BACKEND}/api/cloudwatch/alarms`).then(r => r.json()).catch(() => ({ alarms: [] })),
+      fetch(`${BACKEND}/api/autopilot/status`).then(r => r.json()).catch(() => null)
+    ]);
+
+    awsData = { dashboard, ec2, s3, lambda, rds, alarms, autopilot };
+
+    // Update stats bar
+    document.getElementById('stat-ec2').textContent = `${dashboard.ec2?.running || 0} running`;
+    document.getElementById('stat-s3').textContent = `${dashboard.s3?.total || 0} buckets`;
+    document.getElementById('stat-lambda').textContent = `${dashboard.lambda?.total || 0} fns`;
+    document.getElementById('stat-rds').textContent = `${dashboard.rds?.total || 0} dbs`;
+    document.getElementById('stat-alarms').textContent = `${dashboard.alarms?.active || 0} active`;
+    document.getElementById('stat-cost').textContent = `$${parseFloat(dashboard.cost?.monthly || 0).toFixed(2)}/mo`;
+    document.getElementById('stat-region').textContent = dashboard.region || 'us-east-1';
+
+    // Update sidebar
+    updateSidebar(ec2, s3, lambda, rds);
+
+    // Update autopilot status
+    if (autopilot) updateAutopilotStatus(autopilot);
+
+    // Draw diagram
+    drawDiagram(ec2, s3, lambda, rds, alarms);
+
+    document.getElementById('status-badge').textContent = '● Live';
+    document.getElementById('status-badge').className = 'badge badge-g';
+
+  } catch (e) {
+    document.getElementById('loading').innerHTML = '<div style="color:#ff4f4f;font-size:.85rem;">❌ Backend not connected. Make sure node server.js is running.</div>';
+    document.getElementById('status-badge').textContent = '● Offline';
+  }
+}
+
+function updateSidebar(ec2, s3, lambda, rds) {
+  const html = `
+    <div class="resource-item" onclick="highlightNode('ec2')">
+      <span class="ri-icon">🖥</span>
+      <div class="ri-info"><div class="ri-name">EC2 Instances</div><div class="ri-sub">Compute</div></div>
+      <span class="ri-count">${ec2.instances?.length || 0}</span>
+    </div>
+    <div class="resource-item" onclick="highlightNode('s3')">
+      <span class="ri-icon">🪣</span>
+      <div class="ri-info"><div class="ri-name">S3 Buckets</div><div class="ri-sub">Storage</div></div>
+      <span class="ri-count">${s3.buckets?.length || 0}</span>
+    </div>
+    <div class="resource-item" onclick="highlightNode('lambda')">
+      <span class="ri-icon">⚡</span>
+      <div class="ri-info"><div class="ri-name">Lambda Functions</div><div class="ri-sub">Serverless</div></div>
+      <span class="ri-count">${lambda.functions?.length || 0}</span>
+    </div>
+    <div class="resource-item" onclick="highlightNode('rds')">
+      <span class="ri-icon">🗄</span>
+      <div class="ri-info"><div class="ri-name">RDS Databases</div><div class="ri-sub">Database</div></div>
+      <span class="ri-count">${rds.instances?.length || 0}</span>
+    </div>
+    <div class="resource-item" onclick="highlightNode('igw')">
+      <span class="ri-icon">🌐</span>
+      <div class="ri-info"><div class="ri-name">Internet Gateway</div><div class="ri-sub">Networking</div></div>
+    </div>
+    <div class="resource-item" onclick="highlightNode('cf')">
+      <span class="ri-icon">⚡</span>
+      <div class="ri-info"><div class="ri-name">CloudFront</div><div class="ri-sub">CDN</div></div>
+    </div>
+  `;
+  document.getElementById('sidebar-resources').innerHTML = html;
+}
+
+function updateAutopilotStatus(autopilot) {
+  const statusColor = autopilot.latestStatus === 'HEALTHY' ? '#00d4aa' : '#ff8c42';
+  document.getElementById('autopilot-status').innerHTML = `
+    <div style="color:${statusColor};font-weight:700;margin-bottom:.4rem;">● ${autopilot.latestStatus || 'UNKNOWN'}</div>
+    <div style="color:#4a5568;">Last scan: ${autopilot.lastRun ? new Date(autopilot.lastRun).toLocaleTimeString() : 'Never'}</div>
+    <div style="color:#4a5568;">Issues: ${autopilot.latestIssues || 0} | Fixed: ${autopilot.latestFixes || 0}</div>
+    <div style="color:#4a5568;">Total scans: ${autopilot.totalRuns || 0}</div>
+  `;
+}
+
+function drawDiagram(ec2, s3, lambda, rds, alarms) {
+  const diagram = document.getElementById('diagram');
+  const runningEC2 = ec2.instances?.filter(i => i.state === 'running') || [];
+  const stoppedEC2 = ec2.instances?.filter(i => i.state === 'stopped') || [];
+  const publicBuckets = s3.buckets?.filter(b => b.isPublic) || [];
+  const activeAlarms = alarms.alarms?.filter(a => a.state === 'ALARM') || [];
+
+  diagram.innerHTML = `
+    <div class="region-box" id="arch-diagram">
+      <span class="region-label">🌍 AWS Region: us-east-1</span>
+
+      <!-- INTERNET LAYER -->
+      <div style="text-align:center;margin-bottom:24px;">
+        <div class="section-label">Internet</div>
+        <div style="display:flex;justify-content:center;gap:20px;">
+          <div class="node" id="node-users" onclick="showDetail('users', {name:'Users', type:'Internet Traffic'})">
+            <span class="node-icon">👥</span>
+            <span class="node-name">Users</span>
+            <span class="node-sub">Internet</span>
+          </div>
+          <div class="node" id="node-cf" onclick="showDetail('cloudfront', {name:'CloudFront', type:'CDN', description:'Global content delivery network'})">
+            <span class="node-icon">⚡</span>
+            <span class="node-name">CloudFront</span>
+            <span class="node-sub">CDN</span>
+          </div>
+          <div class="node" id="node-s3" onclick="showDetail('s3', {name:'S3 Buckets', count: '${s3.buckets?.length || 0}', public: '${publicBuckets.length}', type:'Object Storage'})">
+            <span class="node-icon">🪣</span>
+            <span class="node-name">S3</span>
+            <span class="node-sub">${s3.buckets?.length || 0} buckets</span>
+            ${publicBuckets.length > 0 ? `<span class="node-count" style="background:#ff4f4f">${publicBuckets.length} public</span>` : ''}
+          </div>
+        </div>
+      </div>
+
+      <!-- ARROW DOWN -->
+      <div style="text-align:center;color:#1a1f35;font-size:1.5rem;margin:8px 0;">↕</div>
+
+      <!-- VPC -->
+      <div class="vpc-box">
+        <span class="vpc-label">🔒 VPC — Virtual Private Cloud</span>
+
+        <!-- PUBLIC SUBNET -->
+        <div style="border:1px dashed rgba(0,212,170,.2);border-radius:8px;padding:12px;margin-bottom:12px;">
+          <div class="section-label" style="color:#00d4aa;">Public Subnet</div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;">
+            <div class="node" id="node-igw" onclick="showDetail('igw', {name:'Internet Gateway', type:'Network Gateway', description:'Enables VPC internet access'})">
+              <span class="node-icon">🌐</span>
+              <span class="node-name">IGW</span>
+              <span class="node-sub">Gateway</span>
+            </div>
+            <div class="node" id="node-alb" onclick="showDetail('alb', {name:'Load Balancer', type:'Application Load Balancer', description:'Distributes traffic across EC2 instances'})">
+              <span class="node-icon">⚖️</span>
+              <span class="node-name">ALB</span>
+              <span class="node-sub">Load Balancer</span>
+            </div>
+            <div class="node" id="node-nat" onclick="showDetail('nat', {name:'NAT Gateway', type:'Network Address Translation', description:'Private subnet internet access'})">
+              <span class="node-icon">🔀</span>
+              <span class="node-name">NAT</span>
+              <span class="node-sub">Gateway</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRIVATE SUBNET -->
+        <div style="border:1px dashed rgba(255,140,66,.2);border-radius:8px;padding:12px;margin-bottom:12px;">
+          <div class="section-label" style="color:#ff8c42;">Private Subnet — Compute</div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;">
+            ${runningEC2.length > 0 ? runningEC2.slice(0, 6).map(i => `
+              <div class="node" id="node-ec2-${i.id}" onclick="showDetail('ec2', ${JSON.stringify({name:i.name,id:i.id,type:i.type,state:i.state,az:i.az,ip:i.privateIp}).replace(/"/g,'&quot;')})">
+                <span class="node-icon">🖥</span>
+                <span class="node-name">${i.name.length > 12 ? i.name.slice(0,12)+'...' : i.name}</span>
+                <span class="node-sub" style="color:#00d4aa;">● running</span>
+              </div>
+            `).join('') : `
+              <div class="node" style="opacity:.4;" id="node-ec2">
+                <span class="node-icon">🖥</span>
+                <span class="node-name">EC2</span>
+                <span class="node-sub">No instances</span>
+              </div>
+            `}
+            ${stoppedEC2.slice(0, 3).map(i => `
+              <div class="node" style="opacity:.5;" id="node-ec2-stopped-${i.id}">
+                <span class="node-icon">🖥</span>
+                <span class="node-name">${i.name.length > 10 ? i.name.slice(0,10)+'...' : i.name}</span>
+                <span class="node-sub" style="color:#ff4f4f;">○ stopped</span>
+              </div>
+            `).join('')}
+            <div class="node" id="node-lambda" onclick="showDetail('lambda', {name:'Lambda Functions', count:'${lambda.functions?.length || 0}', type:'Serverless Compute'})">
+              <span class="node-icon">⚡</span>
+              <span class="node-name">Lambda</span>
+              <span class="node-sub">${lambda.functions?.length || 0} functions</span>
+              ${lambda.functions?.length > 0 ? `<span class="node-count">${lambda.functions.length}</span>` : ''}
+            </div>
+          </div>
+        </div>
+
+        <!-- DATA SUBNET -->
+        <div style="border:1px dashed rgba(168,85,247,.2);border-radius:8px;padding:12px;">
+          <div class="section-label" style="color:#a855f7;">Data Subnet — Databases</div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;">
+            ${rds.instances?.length > 0 ? rds.instances.slice(0, 4).map(d => `
+              <div class="node" id="node-rds-${d.id}" onclick="showDetail('rds', ${JSON.stringify({name:d.id,engine:d.engine,class:d.class,multiAZ:d.multiAZ,encrypted:d.encrypted}).replace(/"/g,'&quot;')})">
+                <span class="node-icon">🗄</span>
+                <span class="node-name">${d.id.length > 10 ? d.id.slice(0,10)+'...' : d.id}</span>
+                <span class="node-sub">${d.engine}</span>
+                ${!d.encrypted ? '<span class="node-count" style="background:#ff4f4f">!</span>' : ''}
+              </div>
+            `).join('') : `
+              <div class="node" style="opacity:.4;" id="node-rds">
+                <span class="node-icon">🗄</span>
+                <span class="node-name">RDS</span>
+                <span class="node-sub">No databases</span>
+              </div>
+            `}
+            <div class="node" id="node-elasticache" onclick="showDetail('cache', {name:'ElastiCache', type:'In-Memory Cache', description:'Redis/Memcached caching layer'})">
+              <span class="node-icon">⚡</span>
+              <span class="node-name">ElastiCache</span>
+              <span class="node-sub">Cache</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MANAGED SERVICES -->
+      <div style="margin-top:20px;">
+        <div class="section-label">Managed Services</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+          <div class="node" id="node-cw" onclick="showDetail('cloudwatch', {name:'CloudWatch', alarms:'${alarms.alarms?.length || 0}', active:'${activeAlarms.length}', type:'Monitoring'})">
+            <span class="node-icon">📊</span>
+            <span class="node-name">CloudWatch</span>
+            <span class="node-sub">${alarms.alarms?.length || 0} alarms</span>
+            ${activeAlarms.length > 0 ? `<span class="node-count" style="background:#ff4f4f">${activeAlarms.length}</span>` : ''}
+          </div>
+          <div class="node" id="node-iam" onclick="showDetail('iam', {name:'IAM', type:'Identity & Access Management', description:'Users, roles and policies'})">
+            <span class="node-icon">🔑</span>
+            <span class="node-name">IAM</span>
+            <span class="node-sub">Security</span>
+          </div>
+          <div class="node" id="node-sns" onclick="showDetail('sns', {name:'SNS', type:'Simple Notification Service', description:'Push notifications and alerts'})">
+            <span class="node-icon">🔔</span>
+            <span class="node-name">SNS</span>
+            <span class="node-sub">Notifications</span>
+          </div>
+          <div class="node" id="node-sqs" onclick="showDetail('sqs', {name:'SQS', type:'Simple Queue Service', description:'Message queuing service'})">
+            <span class="node-icon">📬</span>
+            <span class="node-name">SQS</span>
+            <span class="node-sub">Queue</span>
+          </div>
+          <div class="node" id="node-route53" onclick="showDetail('route53', {name:'Route 53', type:'DNS Service', description:'Domain name system management'})">
+            <span class="node-icon">🌐</span>
+            <span class="node-name">Route 53</span>
+            <span class="node-sub">DNS</span>
+          </div>
+          <div class="node" id="node-cfn" onclick="showDetail('cfn', {name:'CloudFormation', type:'Infrastructure as Code', description:'AWS resource provisioning'})">
+            <span class="node-icon">📋</span>
+            <span class="node-name">CloudFormation</span>
+            <span class="node-sub">IaC</span>
+          </div>
+          <div class="node" id="node-autopilot" onclick="showDetail('autopilot', {name:'NimbusAI AutoPilot', type:'AI Agent', description:'Autonomous infrastructure monitoring and remediation'})">
+            <span class="node-icon">🤖</span>
+            <span class="node-name">AutoPilot</span>
+            <span class="node-sub" style="color:#00d4aa;">● Active</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  `;
+
+  document.getElementById('loading').style.display = 'none';
+}
+
+function showDetail(type, data) {
+  const panel = document.getElementById('detail-panel');
+  const title = document.getElementById('dp-title');
+  const content = document.getElementById('dp-content');
+
+  title.textContent = data.name || type;
+
+  const items = Object.entries(data)
+    .filter(([k]) => k !== 'name')
+    .map(([k, v]) => `
+      <div class="dp-item">
+        <span class="dp-label">${k}</span>
+        <span class="dp-value">${v}</span>
+      </div>
+    `).join('');
+
+  content.innerHTML = items;
+  panel.classList.add('show');
+
+  // Highlight selected node
+  document.querySelectorAll('.node').forEach(n => n.classList.remove('selected'));
+  const node = document.getElementById(`node-${type}`);
+  if (node) node.classList.add('selected');
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').classList.remove('show');
+  document.querySelectorAll('.node').forEach(n => n.classList.remove('selected'));
+}
+
+function highlightNode(type) {
+  const node = document.getElementById(`node-${type}`);
+  if (node) {
+    node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    node.classList.add('selected');
+    setTimeout(() => node.classList.remove('selected'), 2000);
+  }
+}
+
+async function runAutopilot() {
+  const btn = event.target;
+  btn.textContent = '🤖 Scanning...';
+  btn.disabled = true;
+  try {
+    const res = await fetch(`${BACKEND}/api/autopilot/run`, { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      updateAutopilotStatus(await fetch(`${BACKEND}/api/autopilot/status`).then(r => r.json()));
+      alert(`✅ AutoPilot scan complete!\nIssues found: ${data.result.issuesFound}\nAuto-fixed: ${data.result.actionsFixed}`);
+    }
+  } catch (e) {
+    alert('❌ Failed to run AutoPilot');
+  } finally {
+    btn.textContent = '🤖 Run AutoPilot Scan';
+    btn.disabled = false;
+  }
+}
+
+function exportDiagram() {
+  const el = document.getElementById('arch-diagram');
+  // Simple export — open print dialog
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
+    <html><head><title>NimbusAI Architecture</title>
+    <style>body{background:#07080d;color:#dde3f0;font-family:sans-serif;padding:20px;}</style>
+    </head><body>${el.outerHTML}</body></html>
+  `);
+  printWindow.document.close();
+  printWindow.print();
+}
+
+// Load on startup
+loadDiagram();
+// Auto-refresh every 60 seconds
+setInterval(loadDiagram, 60000);
+</script>
+</body>
+</html>

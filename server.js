@@ -671,6 +671,200 @@ app.post('/api/actions/lambda/invoke/:name', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// ════════════════════════════════════════════════════════
+//  NIMBUSAI AUTOPILOT AGENT
+// ════════════════════════════════════════════════════════
+
+const autopilotLog = [];
+let autopilotRunning = false;
+
+async function runAutopilot() {
+  const timestamp = new Date().toISOString();
+  const actions = [];
+  const issues = [];
+
+  console.log('[AutoPilot] 🤖 Starting scan...');
+
+  await Promise.allSettled([
+
+    // ── CHECK 1: Public S3 Buckets ──────────────────────
+    (async () => {
+      try {
+        const data = await s3.send(new ListBucketsCommand({}));
+        for (const bucket of (data.Buckets || [])) {
+          try {
+            const acl = await s3.send(new GetBucketAclCommand({ Bucket: bucket.Name }));
+            const isPublic = acl.Grants?.some(g =>
+              g.Grantee?.URI === 'http://acs.amazonaws.com/groups/global/AllUsers'
+            );
+            if (isPublic) {
+              issues.push({ type: 'SECURITY', severity: 'CRITICAL', resource: bucket.Name, issue: 'S3 bucket is publicly accessible' });
+              // Auto-fix: block public access
+              await s3.send(new PutPublicAccessBlockCommand({
+                Bucket: bucket.Name,
+                PublicAccessBlockConfiguration: {
+                  BlockPublicAcls: true,
+                  IgnorePublicAcls: true,
+                  BlockPublicPolicy: true,
+                  RestrictPublicBuckets: true
+                }
+              }));
+              actions.push({ type: 'AUTO_FIXED', resource: bucket.Name, action: 'Blocked public access on S3 bucket', timestamp });
+              console.log(`[AutoPilot] ✅ Fixed public S3 bucket: ${bucket.Name}`);
+            }
+          } catch (e) {}
+        }
+      } catch (e) {}
+    })(),
+
+    // ── CHECK 2: CloudWatch Alarms ──────────────────────
+    (async () => {
+      try {
+        const data = await cw.send(new DescribeAlarmsCommand({ StateValue: 'ALARM' }));
+        for (const alarm of (data.MetricAlarms || [])) {
+          issues.push({
+            type: 'ALARM',
+            severity: 'HIGH',
+            resource: alarm.AlarmName,
+            issue: `CloudWatch alarm in ALARM state: ${alarm.MetricName}`
+          });
+          console.log(`[AutoPilot] ⚠️ Active alarm: ${alarm.AlarmName}`);
+        }
+      } catch (e) {}
+    })(),
+
+    // ── CHECK 3: Stopped EC2 Instances ─────────────────
+    (async () => {
+      try {
+        const data = await ec2.send(new DescribeInstancesCommand({}));
+        const instances = data.Reservations.flatMap(r => r.Instances);
+        const stopped = instances.filter(i => i.State.Name === 'stopped');
+        if (stopped.length > 0) {
+          issues.push({
+            type: 'COST',
+            severity: 'LOW',
+            resource: stopped.map(i => i.InstanceId).join(', '),
+            issue: `${stopped.length} stopped EC2 instances found — still paying for EBS storage`
+          });
+        }
+      } catch (e) {}
+    })(),
+
+    // ── CHECK 4: RDS Encryption ─────────────────────────
+    (async () => {
+      try {
+        const data = await rds.send(new DescribeDBInstancesCommand({}));
+        for (const db of (data.DBInstances || [])) {
+          if (!db.StorageEncrypted) {
+            issues.push({
+              type: 'SECURITY',
+              severity: 'HIGH',
+              resource: db.DBInstanceIdentifier,
+              issue: 'RDS instance is not encrypted at rest'
+            });
+          }
+          if (!db.MultiAZ) {
+            issues.push({
+              type: 'RELIABILITY',
+              severity: 'MEDIUM',
+              resource: db.DBInstanceIdentifier,
+              issue: 'RDS instance is not Multi-AZ — single point of failure'
+            });
+          }
+        }
+      } catch (e) {}
+    })(),
+
+    // ── CHECK 5: Cost Anomaly ───────────────────────────
+    (async () => {
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+        const twoDaysAgo = new Date(Date.now() - 172800000).toISOString().split('T')[0];
+
+        const [todayCost, yesterdayCost] = await Promise.all([
+          ce.send(new GetCostAndUsageCommand({
+            TimePeriod: { Start: yesterday, End: today },
+            Granularity: 'DAILY',
+            Metrics: ['UnblendedCost']
+          })),
+          ce.send(new GetCostAndUsageCommand({
+            TimePeriod: { Start: twoDaysAgo, End: yesterday },
+            Granularity: 'DAILY',
+            Metrics: ['UnblendedCost']
+          }))
+        ]);
+
+        const todayAmount = parseFloat(todayCost.ResultsByTime?.[0]?.Total?.UnblendedCost?.Amount || 0);
+        const yesterdayAmount = parseFloat(yesterdayCost.ResultsByTime?.[0]?.Total?.UnblendedCost?.Amount || 0);
+
+        if (yesterdayAmount > 0) {
+          const increase = ((todayAmount - yesterdayAmount) / yesterdayAmount) * 100;
+          if (increase > 20) {
+            issues.push({
+              type: 'COST',
+              severity: 'HIGH',
+              resource: 'AWS Account',
+              issue: `Cost spike detected! ${increase.toFixed(0)}% increase vs yesterday ($${yesterdayAmount.toFixed(2)} → $${todayAmount.toFixed(2)})`
+            });
+          }
+        }
+      } catch (e) {}
+    })()
+
+  ]);
+
+  // Log this run
+  const run = {
+    timestamp,
+    issuesFound: issues.length,
+    actionsFixed: actions.length,
+    issues,
+    actions,
+    status: issues.length === 0 ? 'HEALTHY' : 'ISSUES_FOUND'
+  };
+
+  autopilotLog.unshift(run);
+  if (autopilotLog.length > 50) autopilotLog.pop(); // Keep last 50 runs
+
+  console.log(`[AutoPilot] ✅ Scan complete — ${issues.length} issues, ${actions.length} auto-fixed`);
+  return run;
+}
+
+// ── AutoPilot API Routes ──────────────────────────────
+
+app.get('/api/autopilot/status', async (req, res) => {
+  const latest = autopilotLog[0] || null;
+  res.json({
+    running: autopilotRunning,
+    lastRun: latest?.timestamp || null,
+    totalRuns: autopilotLog.length,
+    latestStatus: latest?.status || 'NOT_RUN',
+    latestIssues: latest?.issuesFound || 0,
+    latestFixes: latest?.actionsFixed || 0,
+    log: autopilotLog.slice(0, 10)
+  });
+});
+
+app.post('/api/autopilot/run', async (req, res) => {
+  try {
+    const result = await runAutopilot();
+    res.json({ success: true, result });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/autopilot/log', async (req, res) => {
+  res.json({ runs: autopilotLog });
+});
+
+// ── Start AutoPilot on server start ──────────────────
+setTimeout(async () => {
+  console.log('[AutoPilot] 🚀 Starting autonomous monitoring...');
+  await runAutopilot(); // Run immediately on start
+  setInterval(runAutopilot, 5 * 60 * 1000); // Then every 5 minutes
+}, 10000); // Wait 10 seconds after server start
 app.listen(PORT, () => {
   console.log('');
   console.log('  ███╗   ██╗██╗███╗   ███╗██████╗ ██╗   ██╗███████╗ █████╗ ██╗');

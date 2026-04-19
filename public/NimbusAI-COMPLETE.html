@@ -405,6 +405,7 @@ progress-ring{transform:rotate(-90deg);}
 <div class="sidebar">
   <div class="sb-section">Overview</div>
   <div class="ni active" id="nav-dashboard" onclick="showPanel('dashboard')"><span class="ico">⬛</span>Dashboard</div>
+    <div class="ni" id="nav-arch" onclick="window.open('architecture.html')"><span class="ico">🏗</span>Architecture<span class="nb nb-o">NEW</span></div>
   <div class="ni" id="nav-ai" onclick="showPanel('ai')"><span class="ico">◈</span>AI Command Center<span class="nb nb-o">AI</span></div>
   <div class="ni" id="nav-alerts" onclick="showPanel('alerts')"><span class="ico">🔔</span>Alerts & Events<span class="nb nb-r">9</span></div>
 
@@ -438,6 +439,7 @@ progress-ring{transform:rotate(-90deg);}
 
   <div class="sb-section">FinOps</div>
   <div class="ni" id="nav-finops" onclick="showPanel('finops')"><span class="ico">$</span>Cost Dashboard</div>
+    <div class="ni" id="nav-arch" onclick="window.open('architecture.html')"><span class="ico">🏗</span>Architecture<span class="nb nb-o">NEW</span></div>
   <div class="ni" id="nav-savings" onclick="showPanel('savings')"><span class="ico">◎</span>Savings Planner</div>
 
   <div class="sb-section">Observability</div>
@@ -750,7 +752,8 @@ progress-ring{transform:rotate(-90deg);}
 <!-- ═══════════════════════════════════════════════════════════ FINOPS -->
 <div class="panel" id="panel-finops">
 <div class="scroll">
-  <div class="ph"><div class="ph-left"><div class="ph-title">FinOps Cost Dashboard</div><div class="ph-sub">AI-powered cost optimization — $2,840 in savings identified</div></div>
+  <div class="ph"><div class="ph-left"><div class="ph-title">FinOps Cost Dashboard</div>
+    <div class="ni" id="nav-arch" onclick="window.open('architecture.html')"><span class="ico">🏗</span>Architecture<span class="nb nb-o">NEW</span></div><div class="ph-sub">AI-powered cost optimization — $2,840 in savings identified</div></div>
   <div class="ph-actions"><button class="btn btn-ghost btn-sm" onclick="ai('I am spending $8,412/month on AWS. Do a comprehensive FinOps analysis: identify top 10 cost optimizations, ROI for each, implementation effort, and a 90-day savings roadmap to get my bill under $5,500.')">Full FinOps Audit ↗</button><button class="btn btn-primary btn-sm">Export Report</button></div></div>
   <div class="stats-grid stats-4">
     <div class="stat stat-r"><div class="stat-label">Current Spend</div><div class="stat-val s-r">$8,412</div><div class="stat-sub stat-dn">▲ 18% over budget</div></div>
